@@ -1,5 +1,5 @@
 # All data sets for modeling
-import seaborn as sns
+from altair import load_dataset
 
 
-iris = sns.load_dataset('iris')
+iris = load_dataset('iris')
