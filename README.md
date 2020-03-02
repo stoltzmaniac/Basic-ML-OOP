@@ -19,7 +19,7 @@ You will be able to pass extra parameters into your CLI, these will be discussed
 
 ### 01-Regression/Single-Linear-Regression/Part-01    
 
-Read the blog post: Stoltzmaniac
+Read the blog post on [Stoltzmaniac](https://www.stoltzmaniac.com/single-linear-regression-part-1-python-ml-oop-basics/)
 
 One of the most basic "machine learning" algorithims is linear regression. The term "machine learning" is used very loosely here due to the fact this algorithm is 100+ years old. However, because it is fitting data and is very simple to use, it makes for a great starting point.
 
