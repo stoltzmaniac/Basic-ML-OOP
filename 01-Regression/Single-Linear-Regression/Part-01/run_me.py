@@ -35,5 +35,3 @@ def main(dataset: str, predict: int):
 
 if __name__ == '__main__':
     main()
-    print('Finished run_me.py')
-    input("Press enter to exit")
