@@ -3,24 +3,22 @@
 
 class SingleLinearRegression:
 
-    def __init__(self, independent_var: list, dependent_var: list, n_predictions: int):
+    def __init__(self, independent_var: list, dependent_var: list, predict: float):
 
         """
-        Completes either a single or multiple linear regression
+        Completes either a single or multiple linear regression. We will pass a single value to predict.
         :param independent_var: list
         :param dependent_var: list
+        :param predict: float
         """
         self.independent_var = independent_var
         self.dependent_var = dependent_var
-        self.n_predictions = n_predictions
+        self.predict = predict
 
     def fit(self) -> dict:
         pass
 
-    def predict(self) -> dict:
-        pass
-
-    def __repr__(self):
+    def predictions(self) -> dict:
         pass
 
     def __str__(self):
@@ -30,15 +28,14 @@ class SingleLinearRegression:
                 'independent_var': {self.independent_var},
                 'dependent_var': {self.dependent_var},
                 'fit': {{
-                    'coefficient': coefficent,
+                    'coefficient': coefficient,
                     'constant': constant,
                     'r_squared': r_squared,
                     'p_values': 'p_values'
-                    }},
-                'n_predictions': {self.n_predictions}, 
+                    }}, 
                 'predictions': {{
-                    'x': [],
-                    'y': []
+                    'predict': {self.predict},
+                    'result': result_of_predictions.
                     }}
             }}
             :return: dict

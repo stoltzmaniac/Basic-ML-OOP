@@ -8,9 +8,9 @@ from linear_regression import SingleLinearRegression
 @click.option('-d', '--dataset', default='./data/fake_data.csv',
               help='Dataset with independent variable in first column and dependent variable in second. \
               Dataset has a header row.')
-@click.option('-n', '--n_predictions', default=5,
-              help='Length of predictions beyond original dataset. Positive values only.')
-def main(dataset: str, n_predictions: int):
+@click.option('-p', '--predict', default=2.5,
+              help='Dependent variable value you would like to use the fit to predict.')
+def main(dataset: str, predict: int):
     print('Starting run_me.py')
 
     # Read in csv data
@@ -27,7 +27,7 @@ def main(dataset: str, n_predictions: int):
     single_linear_regression = SingleLinearRegression(
         independent_var=independent_data,
         dependent_var=dependent_data,
-        n_predictions=n_predictions
+        predict=predict
     )
 
     print(single_linear_regression)
