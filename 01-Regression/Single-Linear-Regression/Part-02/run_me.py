@@ -1,5 +1,4 @@
 # Code to execute from cli
-# Code to execute from cli
 import csv
 import click
 

@@ -24,12 +24,10 @@ class Regression:
         self.independent_vars = independent_vars
 
 
-# x = np.array([[1,3,4], [8,9,10]])
-# y = np.array([4,5,6])
-# a = Regression(x, y)
-
-
 class SingleLinearRegression(Regression):
+    """
+    For single linear regression only, does not support multiple independent variables
+    """
     def __init__(self, independent_vars, dependent_var):
         super().__init__(independent_vars, dependent_var)
 
@@ -102,88 +100,3 @@ class SingleLinearRegression(Regression):
             RMSE: {round(self.root_mean_squared_error(), 2)}\n
             R^2: {round(self.r_squared(), 2)}
             """
-
-#
-# x = np.array([1,2,3])
-# y = np.array([4,5,6])
-# b = SingleLinearRegression(x, y)
-# b.plot()
-# print(b.b1)
-# print(b.b0)
-# print(b.root_mean_squared_error())
-# print(b.r_squared())
-#
-# x = np.array([1,2,3,4,3,7,12,5,23,10])
-# y = np.array([4,5,6,2,3,1,12,4,11,15])
-# b = SingleLinearRegression(x, y)
-# b.plot(title='Hello World', x_label='My X-Axis', y_label='My Y-Axis',
-#        point_color='green', line_color='black')
-# print(b.b1)
-# print(b.b0)
-# print(b.root_mean_squared_error())
-# print(b.r_squared())
-# pandas --> np.array(df[['independent_var', 'dependent_var']])
-#
-#
-#     self.results = {
-#         'independent_var': self.independent_var,
-#         'dependent_var': self.dependent_var,
-#         'fit': {
-#             'coefficient': None,
-#             'constant': None,
-#             'r_squared': None,
-#             'p_values': None
-#         },
-#         'predictions': {
-#             'predict': self.predict,
-#             'result': None
-#         }
-#     }
-#
-# def fit(self) -> dict:
-#     """
-#     Fit the linear regression to format y = b1*x + b0
-#     :return:
-#     """
-#     coefficients = self.calculate_coefficient_and_constant()
-#     self.results['fit']['coefficient'] = coefficients['b1']
-#     self.results['fit']['constant'] = coefficients['b0']
-#
-# def predictions(self) -> dict:
-#     pass
-#
-# def calculate_coefficient_and_constant(self) -> dict:
-#     x_mean = mean(self.independent_var)
-#     y_mean = mean(self.dependent_var)
-#     x_minus_mean = [x - x_mean for x in self.independent_var]
-#     y_minus_mean = [y - y_mean for y in self.dependent_var]
-#     b1_numerator = sum([x * y for x, y in zip(x_minus_mean, y_minus_mean)])
-#     b1_denominator = sum([(x - x_mean) ** 2 for x in self.independent_var])
-#     b1 = b1_numerator / b1_denominator
-#     b0 = y_mean - (b1 * x_mean)
-#     return {'b1': b1, 'b0': b0}
-#
-# def calculate_r_squared_and_p_values(self) -> dict:
-#     y_fit_values = [x * self.results['fit']['coefficient'] + self.results['fit']['constant'] for x in self.independent_var]
-#     print(y_fit_values)
-#
-#
-# def __str__(self):
-#     return f"""
-#         This class returns a dictionary of results from your on your linear regression:
-#         {{
-#             'independent_var': {self.independent_var},
-#             'dependent_var': {self.dependent_var},
-#             'fit': {{
-#                 'coefficient': coefficient,
-#                 'constant': constant,
-#                 'r_squared': r_squared,
-#                 'p_values': 'p_values'
-#                 }},
-#             'predictions': {{
-#                 'predict': {self.predict},
-#                 'result': result_of_predictions.
-#                 }}
-#         }}
-#         :return: dict
-#         """
