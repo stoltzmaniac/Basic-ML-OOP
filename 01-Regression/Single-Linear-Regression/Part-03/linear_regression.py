@@ -1,6 +1,7 @@
 # All models for modeling
 import numpy as np
 import matplotlib.pyplot as plt
+plt.style.use('fivethirtyeight')
 
 
 class Regression:
@@ -80,7 +81,7 @@ class SingleLinearRegression(Regression):
         dependent_var_hat = self.predict(independent_vars_hat)
         plt.plot(independent_vars_hat, dependent_var_hat, color=line_color)
         plt.scatter(self.independent_vars, self.dependent_var, color=point_color)
-        plt.text(x=min(self.independent_vars), y=max(self.dependent_var),
+        plt.text(x=min(self.independent_vars)*1.1, y=max(self.dependent_var)*0.9,
                  bbox=dict(),
                  s=f'b1: {round(self.b1, 2)}\n'
                    f'b0: {round(self.b0, 2)}\n'
