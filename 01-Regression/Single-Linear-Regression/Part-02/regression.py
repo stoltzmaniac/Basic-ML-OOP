@@ -53,9 +53,9 @@ class SingleLinearRegression:
         return f"""
             Model Results
             -------------
-            b1: {round(self.b1, 2)}\n
-            b0: {round(self.b0, 2)}\n
-            RMSE: {round(self.root_mean_squared_error(), 2)}\n
+            b1: {round(self.b1, 2)}
+            b0: {round(self.b0, 2)}
+            RMSE: {round(self.root_mean_squared_error(), 2)}
             R^2: {round(self.r_squared(), 2)}
             """
 

@@ -28,9 +28,9 @@ def test_single_linear_regression_fit(reg_model):
     :return:
     """
     reg_model.fit()
-    print(reg_model)
     assert(pytest.approx(reg_model.b1, 0.01) == 1.14)
     assert(pytest.approx(reg_model.b0, 0.01) == 0.43)
+
 
 def test_single_linear_regression_rmse(reg_model):
     """
@@ -39,6 +39,7 @@ def test_single_linear_regression_rmse(reg_model):
     """
     reg_model.fit()
     assert(pytest.approx(reg_model.root_mean_squared_error(), 0.02) == 0.31)
+
 
 def test_single_linear_regression_r_squared(reg_model):
     """
