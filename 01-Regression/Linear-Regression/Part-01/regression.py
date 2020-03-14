@@ -84,9 +84,15 @@ class LinearRegression(Regression):
         return predicted_values
 
     @property
-    def r_squared(self):
+    def r_squared_train(self):
         sum_sq_r = np.sum((self.predict(self.independent_vars_train) - self.dependent_var_train[:, 0]) ** 2)
         sum_sq_t = np.sum((self.dependent_var_train[:, 0] - self.dependent_var_train[:, 0].mean()) ** 2)
+        return 1 - (sum_sq_r / sum_sq_t)
+
+    @property
+    def r_squared_test(self):
+        sum_sq_r = np.sum((self.predict(self.independent_vars_test) - self.dependent_var_test[:, 0]) ** 2)
+        sum_sq_t = np.sum((self.dependent_var_test[:, 0] - self.dependent_var_test[:, 0].mean()) ** 2)
         return 1 - (sum_sq_r / sum_sq_t)
 
     def __str__(self):
@@ -94,7 +100,8 @@ class LinearRegression(Regression):
             Model Results
             -------------
             Betas: {self.B}
-            R^2: {self.r_squared}
+            R^2 Train: {self.r_squared_train}
+            R^2 Test: {self.r_squared_test}
             """
 
 # Example
