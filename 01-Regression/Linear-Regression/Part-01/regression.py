@@ -67,7 +67,8 @@ class LinearRegression(Regression):
         else:
             self.B = np.zeros(self.independent_vars_train.shape[1])
 
-        # self.fit_gradient_descent()
+        # Automatically fit
+        self.fit_gradient_descent()
 
     def fit_gradient_descent(self):
         len_dep_var_train = len(self.dependent_var_train[:, 0])
@@ -78,58 +79,52 @@ class LinearRegression(Regression):
             cost = np.sum((self.independent_vars_train.dot(self.B) - self.dependent_var_train[:, 0]) ** 2) / (2 * len_dep_var_train)
             self.cost.append(cost)
 
+    def predict(self, values_to_predict: np.ndarray):
+        predicted_values = values_to_predict.dot(self.B)
+        return predicted_values
 
-    # def predict(self, values_to_predict: np.ndarray):
-    #     predicted_values = values_to_predict * self.b1 + self.b0
-    #     return predicted_values
-    #
-    # def root_mean_squared_error(self):
-    #     dependent_var_hat = self.predict(self.independent_vars_train)
-    #     sum_of_res = np.sum((dependent_var_hat - self.dependent_var_train) ** 2)
-    #     rmse = np.sqrt(sum_of_res / len(dependent_var_hat))
-    #     return rmse
-    #
-    # def r_squared(self):
-    #     dependent_var_hat = self.predict(self.independent_vars_train)
-    #     sum_of_sq = np.sum((self.dependent_var_train - self.dependent_var_train_mean) ** 2)
-    #     sum_of_res = np.sum((self.dependent_var_train - dependent_var_hat) ** 2)
-    #     return 1 - (sum_of_res / sum_of_sq)
+    @property
+    def r_squared(self):
+        sum_sq_r = np.sum((self.predict(self.independent_vars_train) - self.dependent_var_train[:, 0]) ** 2)
+        sum_sq_t = np.sum((self.dependent_var_train[:, 0] - self.dependent_var_train[:, 0].mean()) ** 2)
+        return 1 - (sum_sq_r / sum_sq_t)
 
     def __str__(self):
         return f"""
             Model Results
             -------------
             Betas: {self.B}
-            Costs: {self.cost}
+            R^2: {self.r_squared}
             """
 
-
-# a = np.array([ [ 0,  1,  2],
-#                [ 3,  4,  5],
-#                [ 6,  7,  8],
-#                [10, 11, 12],
-#                [13, 14, 15],
-#                [16, 17, 18]])
-# b = np.array([['a','b','c','d','e','f']])
-# a = np.array([ [ 0],
-#                [ 3],
-#                [ 6],
-#                [10],
-#                [13.9],
-#                [16.1]])
-# b = np.array([ [7,
-#                5,
-#                8.2,
-#                12,
-#                15.4,
-#                8]])
+# Example
+# import pandas as pd
+# import numpy as np
+# from regression import LinearRegression, Regression
 #
-# dependent_var = df[:, 3]
-# independent_vars = df[:, 2]
-# c = LinearRegression(independent_vars=independent_vars,
-#                      dependent_var=dependent_var,
-#                      learning_rate=1.0,
-#                      train_split=0.67,
-#                      seed=123)
+# # Single
+# data = pd.read_csv('/Users/stoltzmanconsulting/Documents/Git-Repositories/GitHub/Basic-ML-OOP/01-Regression/Linear-Regression/Part-01/tests/my_test_data/my_test_data_2.csv')
+# single_linear_regression = LinearRegression(
+#     independent_vars=np.array(data)[:, :1],
+#     dependent_var=np.array(data)[:, -1],
+#     iterations=1000,
+#     learning_rate=0.001,
+#     train_split=0.7,
+#     seed=123
+# )
 #
-# print(c)
+# print(single_linear_regression)
+#
+#
+# # Multiple
+# data = pd.read_csv('/Users/stoltzmanconsulting/Documents/Git-Repositories/GitHub/Basic-ML-OOP/01-Regression/Linear-Regression/Part-01/tests/my_test_data/my_test_data.csv')
+# multiple_linear_regression = LinearRegression(
+#     independent_vars=np.array(data)[:, :3],
+#     dependent_var=np.array(data)[:, -1],
+#     iterations=1000,
+#     learning_rate=0.001,
+#     train_split=0.7,
+#     seed=123
+# )
+#
+# print(multiple_linear_regression)
