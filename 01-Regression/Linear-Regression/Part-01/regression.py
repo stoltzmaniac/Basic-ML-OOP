@@ -32,7 +32,8 @@ class Regression:
             raise ValueError(f'Dimension(s) of data for Regression class are not accurate')
 
         all_data = np.column_stack((independent_vars, dependent_var))
-        # all_data = np.concatenate((independent_vars, dependent_var.T), axis=1)
+        # Add ones column to allow for beta 0
+        all_data = np.c_[np.ones(len(all_data), dtype='int64'), all_data]
         np.random.seed(seed)
         np.random.shuffle(all_data)
 
@@ -99,7 +100,7 @@ class LinearRegression(Regression):
         return f"""
             Model Results
             -------------
-            Betas: {self.B}
+            Betas: {[i for i in zip(range(len(self.B)), self.B)]}
             R^2 Train: {self.r_squared_train}
             R^2 Test: {self.r_squared_test}
             """
