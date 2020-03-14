@@ -6,10 +6,10 @@ class Regression:
     def __init__(self,
                  independent_vars: np.ndarray,
                  dependent_var: np.ndarray,
-                 iterations: int = 1000,
-                 learning_rate: float = 0.01,
-                 train_split: float = 0.7,
-                 seed: int = 123):
+                 iterations: int,
+                 learning_rate: float,
+                 train_split: float,
+                 seed: int):
         """
         :param independent_vars: np.ndarray
         :param dependent_var: np.array (one dimensional)
