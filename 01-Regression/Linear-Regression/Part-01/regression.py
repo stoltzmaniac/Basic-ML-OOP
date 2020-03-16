@@ -33,7 +33,7 @@ class Regression:
 
         all_data = np.column_stack((independent_vars, dependent_var))
         # Add ones column to allow for beta 0
-        all_data = np.c_[np.ones(len(all_data), dtype='int64'), all_data]
+        all_data = np.c_[np.zeros(len(all_data), dtype='int64'), all_data]
         np.random.seed(seed)
         np.random.shuffle(all_data)
 
@@ -84,16 +84,9 @@ class LinearRegression(Regression):
         predicted_values = values_to_predict.dot(self.B)
         return predicted_values
 
-    @property
-    def r_squared_train(self):
-        sum_sq_r = np.sum((self.predict(self.independent_vars_train) - self.dependent_var_train[:, 0]) ** 2)
-        sum_sq_t = np.sum((self.dependent_var_train[:, 0] - self.dependent_var_train[:, 0].mean()) ** 2)
-        return 1 - (sum_sq_r / sum_sq_t)
-
-    @property
-    def r_squared_test(self):
-        sum_sq_r = np.sum((self.predict(self.independent_vars_test) - self.dependent_var_test[:, 0]) ** 2)
-        sum_sq_t = np.sum((self.dependent_var_test[:, 0] - self.dependent_var_test[:, 0].mean()) ** 2)
+    def calculate_r_squared(self, independent_vars, dependent_var):
+        sum_sq_r = np.sum((dependent_var - self.predict(independent_vars)) ** 2)
+        sum_sq_t = np.sum((dependent_var - dependent_var.mean()) ** 2)
         return 1 - (sum_sq_r / sum_sq_t)
 
     def __str__(self):
@@ -101,8 +94,8 @@ class LinearRegression(Regression):
             Model Results
             -------------
             Betas: {[i for i in zip(range(len(self.B)), self.B)]}
-            R^2 Train: {self.r_squared_train}
-            R^2 Test: {self.r_squared_test}
+            R^2 Train: {self.calculate_r_squared(self.independent_vars_train, self.dependent_var_train[:, 0])}
+            R^2 Test: {self.calculate_r_squared(self.independent_vars_test, self.dependent_var_test[:, 0])}
             """
 
 # Example
