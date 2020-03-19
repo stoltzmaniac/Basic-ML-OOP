@@ -1,6 +1,6 @@
 # All models for modeling
 import numpy as np
-
+import matplotlib.pyplot as plt
 
 class Regression:
     def __init__(
@@ -11,6 +11,7 @@ class Regression:
         learning_rate: float,
         train_split: float,
         seed: int,
+        plot_style: str
     ):
         """
         :param independent_vars: np.ndarray
@@ -19,10 +20,13 @@ class Regression:
         :param learning_rate: float
         :param train_split: float (0 < value < 1)
         :param seed: int
+        :param plot_style: str (ex. 'fivethirtyeight')
         """
         # Check data types
         if type(seed) != int:
             raise ValueError(f"seed value not an int")
+        if type(plot_style) != str:
+            raise ValueError(f"plot_style not a str")
         if type(iterations) != int or iterations <= 0:
             raise ValueError(f"Invalid iterations value")
         type_check_arrays = [
@@ -41,6 +45,8 @@ class Regression:
             raise ValueError(
                 f"Dimension(s) of data for Regression class are not accurate"
             )
+
+        plt.style.use(plot_style)
 
         all_data = np.column_stack((independent_vars, dependent_var))
         all_data = all_data.astype("float")
@@ -62,9 +68,6 @@ class Regression:
         self.learning_rate = learning_rate
         self.iterations = iterations
         self.cost = []
-
-    def plot(self):
-        pass
 
 
 class LinearRegression(Regression):
