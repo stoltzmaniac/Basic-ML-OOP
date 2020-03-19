@@ -76,6 +76,10 @@ class LinearRegression(Regression):
         # Automatically fit
         self.fit_gradient_descent()
 
+    def predict(self, values_to_predict: np.ndarray):
+        predicted_values = values_to_predict.dot(self.B).flatten()
+        return predicted_values
+
     def find_gradient(self):
         estimate = self.predict(self.independent_vars_train)
         error = (self.dependent_var_train.flatten() - estimate)
@@ -87,10 +91,6 @@ class LinearRegression(Regression):
         for i in range(self.iterations):
             gradient = self.find_gradient()
             self.B = self.B - (self.learning_rate * gradient)
-
-    def predict(self, values_to_predict: np.ndarray):
-        predicted_values = values_to_predict.dot(self.B).flatten()
-        return predicted_values
 
     def calculate_r_squared(self, independent_vars, dependent_var):
         sum_sq_r = np.sum((dependent_var - self.predict(independent_vars)) ** 2)
