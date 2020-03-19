@@ -32,8 +32,7 @@ class Regression:
             raise ValueError(f'Dimension(s) of data for Regression class are not accurate')
 
         all_data = np.column_stack((independent_vars, dependent_var))
-        # Add ones column to allow for beta 0
-        all_data = np.c_[np.zeros(len(all_data), dtype='int64'), all_data]
+        all_data = all_data.astype('float')
         np.random.seed(seed)
         np.random.shuffle(all_data)
 
@@ -62,6 +61,12 @@ class LinearRegression(Regression):
         """
         super().__init__(independent_vars, dependent_var, iterations, learning_rate, train_split, seed)
 
+        # Add ones column to allow for beta 0
+        self.independent_vars_train = np.c_[
+            np.ones(len(self.independent_vars_train), dtype='int64'), self.independent_vars_train]
+        self.independent_vars_test = np.c_[
+            np.ones(len(self.independent_vars_test), dtype='int64'), self.independent_vars_test]
+
         # Initialize betas
         if len(self.independent_vars_train.shape) == 1:
             self.B = np.zeros(1)
@@ -71,17 +76,20 @@ class LinearRegression(Regression):
         # Automatically fit
         self.fit_gradient_descent()
 
+    def find_gradient(self):
+        estimate = self.predict(self.independent_vars_train)
+        error = (self.dependent_var_train.flatten() - estimate)
+        gradient = -(1.0/len(self.independent_vars_train)) * error.dot(self.independent_vars_train)
+        self.cost.append(np.power(error, 2))
+        return gradient
+
     def fit_gradient_descent(self):
-        len_dep_var_train = len(self.dependent_var_train[:, 0])
         for i in range(self.iterations):
-            loss = self.independent_vars_train.dot(self.B) - self.dependent_var_train[:, 0]
-            gradient = self.independent_vars_train.T.dot(loss) / len_dep_var_train
-            self.B = self.B - (gradient * self.learning_rate)
-            cost = np.sum((self.independent_vars_train.dot(self.B) - self.dependent_var_train[:, 0]) ** 2) / (2 * len_dep_var_train)
-            self.cost.append(cost)
+            gradient = self.find_gradient()
+            self.B = self.B - (self.learning_rate * gradient)
 
     def predict(self, values_to_predict: np.ndarray):
-        predicted_values = values_to_predict.dot(self.B)
+        predicted_values = values_to_predict.dot(self.B).flatten()
         return predicted_values
 
     def calculate_r_squared(self, independent_vars, dependent_var):
@@ -97,35 +105,3 @@ class LinearRegression(Regression):
             R^2 Train: {self.calculate_r_squared(self.independent_vars_train, self.dependent_var_train[:, 0])}
             R^2 Test: {self.calculate_r_squared(self.independent_vars_test, self.dependent_var_test[:, 0])}
             """
-
-# Example
-# import pandas as pd
-# import numpy as np
-# from regression import LinearRegression, Regression
-#
-# # Single
-# data = pd.read_csv('/Users/stoltzmanconsulting/Documents/Git-Repositories/GitHub/Basic-ML-OOP/01-Regression/Linear-Regression/Part-01/tests/my_test_data/my_test_data_2.csv')
-# single_linear_regression = LinearRegression(
-#     independent_vars=np.array(data)[:, :1],
-#     dependent_var=np.array(data)[:, -1],
-#     iterations=1000,
-#     learning_rate=0.001,
-#     train_split=0.7,
-#     seed=123
-# )
-#
-# print(single_linear_regression)
-#
-#
-# # Multiple
-# data = pd.read_csv('/Users/stoltzmanconsulting/Documents/Git-Repositories/GitHub/Basic-ML-OOP/01-Regression/Linear-Regression/Part-01/tests/my_test_data/my_test_data.csv')
-# multiple_linear_regression = LinearRegression(
-#     independent_vars=np.array(data)[:, :3],
-#     dependent_var=np.array(data)[:, -1],
-#     iterations=1000,
-#     learning_rate=0.001,
-#     train_split=0.7,
-#     seed=123
-# )
-#
-# print(multiple_linear_regression)
