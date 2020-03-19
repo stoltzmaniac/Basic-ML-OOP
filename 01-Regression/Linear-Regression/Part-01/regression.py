@@ -3,13 +3,15 @@ import numpy as np
 
 
 class Regression:
-    def __init__(self,
-                 independent_vars: np.ndarray,
-                 dependent_var: np.ndarray,
-                 iterations: int,
-                 learning_rate: float,
-                 train_split: float,
-                 seed: int):
+    def __init__(
+        self,
+        independent_vars: np.ndarray,
+        dependent_var: np.ndarray,
+        iterations: int,
+        learning_rate: float,
+        train_split: float,
+        seed: int,
+    ):
         """
         :param independent_vars: np.ndarray
         :param dependent_var: np.array (one dimensional)
@@ -20,19 +22,28 @@ class Regression:
         """
         # Check data types
         if type(seed) != int:
-            raise ValueError(f'seed value not an int')
+            raise ValueError(f"seed value not an int")
         if type(iterations) != int or iterations <= 0:
-            raise ValueError(f'Invalid iterations value')
-        type_check_arrays = [type(independent_vars) == np.ndarray, type(dependent_var) == np.ndarray]
+            raise ValueError(f"Invalid iterations value")
+        type_check_arrays = [
+            type(independent_vars) == np.ndarray,
+            type(dependent_var) == np.ndarray,
+        ]
         if not all(type_check_arrays):
-            raise ValueError(f'Type(s) of data for Regression class are not accurate')
-        if not type(learning_rate) == float and type(train_split) == float and train_split <= 1:
-            raise ValueError(f'learning_rate or train_split not acceptable input(s)')
+            raise ValueError(f"Type(s) of data for Regression class are not accurate")
+        if (
+            not type(learning_rate) == float
+            and type(train_split) == float
+            and train_split <= 1
+        ):
+            raise ValueError(f"learning_rate or train_split not acceptable input(s)")
         if dependent_var.shape[0] != independent_vars.shape[0]:
-            raise ValueError(f'Dimension(s) of data for Regression class are not accurate')
+            raise ValueError(
+                f"Dimension(s) of data for Regression class are not accurate"
+            )
 
         all_data = np.column_stack((independent_vars, dependent_var))
-        all_data = all_data.astype('float')
+        all_data = all_data.astype("float")
         np.random.seed(seed)
         np.random.shuffle(all_data)
 
@@ -54,18 +65,36 @@ class Regression:
 
 
 class LinearRegression(Regression):
-
-    def __init__(self, independent_vars, dependent_var, iterations, learning_rate, train_split, seed):
+    def __init__(
+        self,
+        independent_vars,
+        dependent_var,
+        iterations,
+        learning_rate,
+        train_split,
+        seed,
+    ):
         """
         All inherited from Regression class
         """
-        super().__init__(independent_vars, dependent_var, iterations, learning_rate, train_split, seed)
+        super().__init__(
+            independent_vars,
+            dependent_var,
+            iterations,
+            learning_rate,
+            train_split,
+            seed,
+        )
 
         # Add ones column to allow for beta 0
         self.independent_vars_train = np.c_[
-            np.ones(len(self.independent_vars_train), dtype='int64'), self.independent_vars_train]
+            np.ones(len(self.independent_vars_train), dtype="int64"),
+            self.independent_vars_train,
+        ]
         self.independent_vars_test = np.c_[
-            np.ones(len(self.independent_vars_test), dtype='int64'), self.independent_vars_test]
+            np.ones(len(self.independent_vars_test), dtype="int64"),
+            self.independent_vars_test,
+        ]
 
         # Initialize betas
         if len(self.independent_vars_train.shape) == 1:
@@ -82,8 +111,10 @@ class LinearRegression(Regression):
 
     def find_gradient(self):
         estimate = self.predict(self.independent_vars_train)
-        error = (self.dependent_var_train.flatten() - estimate)
-        gradient = -(1.0/len(self.independent_vars_train)) * error.dot(self.independent_vars_train)
+        error = self.dependent_var_train.flatten() - estimate
+        gradient = -(1.0 / len(self.independent_vars_train)) * error.dot(
+            self.independent_vars_train
+        )
         self.cost.append(np.power(error, 2))
         return gradient
 
