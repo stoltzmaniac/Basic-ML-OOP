@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from regression import LinearRegression
+from models.regression import LinearRegression
 
 
 @pytest.fixture(scope="module")

@@ -79,6 +79,7 @@ class LinearRegression(Regression):
         learning_rate,
         train_split,
         seed,
+        plot_style,
     ):
         """
         All inherited from Regression class
@@ -90,6 +91,7 @@ class LinearRegression(Regression):
             learning_rate,
             train_split,
             seed,
+            plot_style,
         )
 
         # Add ones column to allow for beta 0
@@ -133,6 +135,45 @@ class LinearRegression(Regression):
         sum_sq_r = np.sum((dependent_var - self.predict(independent_vars)) ** 2)
         sum_sq_t = np.sum((dependent_var - dependent_var.mean()) ** 2)
         return 1 - (sum_sq_r / sum_sq_t)
+
+    def plot(self, increment=100,
+             title=None, x_label=None, y_label=None):
+        # If plot min / max not given, define based off of min and max of data
+        for i in range(self.independent_vars_train.shape[1]-1):
+            independent_var_train = self.independent_vars_train[:, i+1]
+            independent_var_test = self.independent_vars_test[:, i+1]
+            dependent_var_train = self.dependent_var_train[:, 0]
+            dependent_var_test = self.dependent_var_test[:, 0]
+
+            # # Set min/max axes
+            min_independent_vars = min(np.min(independent_var_train), np.min(independent_var_test))
+            max_independent_vars = max(np.max(independent_var_train), np.max(independent_var_test))
+            min_dependent_vars = min(np.min(dependent_var_train), np.min(dependent_var_test))
+            max_dependent_vars = max(np.max(dependent_var_train), np.max(dependent_var_test))
+
+            # # Set x-axis range
+            # independent_vars_hat = np.linspace(min_independent_vars, max_independent_vars, increment)
+            # dependent_var_hat = self.predict(independent_vars_hat)
+
+            plot_data_train = np.c_[independent_var_train, self.predict(self.independent_vars_train)]
+            plot_data_train.sort(axis=0)
+
+            # Plot regression line
+            plt.plot(plot_data_train[:, 0], plot_data_train[:, 1], color='red')
+
+            # Plot train points
+            plt.scatter(independent_var_train, dependent_var_train, color='green')
+
+            # Plot test points
+            plt.scatter(independent_var_test, dependent_var_test, color='blue')
+
+            plt.text(x=min_independent_vars * 1.1, y=max_dependent_vars * 0.9,
+                     bbox=dict(),
+                     s=f'')
+            plt.xlabel(x_label)
+            plt.ylabel(y_label)
+            plt.title(title)
+            plt.show()
 
     def __str__(self):
         return f"""
