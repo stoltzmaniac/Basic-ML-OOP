@@ -79,3 +79,46 @@ class SplitTestTrain(InputData):
         train_idx, test_idx = indices[:split_row], indices[split_row:]
         self.predictor_vars_train, self.predictor_vars_test = self.predictor_vars[train_idx, :], self.predictor_vars[test_idx, :]
         self.response_var_train, self.response_var_test = self.response_var[train_idx], self.response_var[test_idx]
+
+
+class PreProcessData(SplitTestTrain):
+    def __init__(self, predictor_vars, response_var,
+                 train_split=0.70, seed=123,
+                 scale=None):
+        """
+        Split the input data to test / train split to be used in machine learning
+        :param predictor_vars: np.ndarray
+        :param response_var: np.ndarray
+        :param train_split: float percent used as training (Between 0 and 1)
+        :param seed: int for repeatability
+        :param scale: str -> 'normalize', 'standardize', 'min_max', 'scale'
+        """
+        self.scale = scale
+        self.predictor_vars_train_scale = None
+        super().__init__(predictor_vars, response_var, train_split, seed)
+        self.preprocess()
+
+    def preprocess(self):
+        predictor_mean = np.mean(self.predictor_vars_train, axis=0)
+        predictor_std = np.std(self.predictor_vars_train, axis=0)
+        predictor_max = np.max(self.predictor_vars_train, axis=0)
+        predictor_min = np.min(self.predictor_vars_train, axis=0)
+        if self.scale == 'min_max':
+            self.predictor_vars_train_scale = (self.predictor_vars_train - predictor_min) / (predictor_max - predictor_mean)
+        elif self.scale == 'normalize':
+            self.predictor_vars_train_scale = (self.predictor_vars_train - predictor_mean) / (predictor_max-predictor_min)
+        elif self.scale == 'standardize':
+            self.predictor_vars_train_scale = (self.predictor_vars_train - predictor_mean) / predictor_std
+        elif self.scale == 'scale':
+            self.predictor_vars_train_scale = self.predictor_vars_train - predictor_mean
+        else:
+            self.predictor_vars_train_scale = self.predictor_vars_train
+
+
+# #normalize
+# x = np.array(data)
+# x_mean = np.mean(x, axis=0)
+# x_std = np.std(x, axis=0)
+#
+# x1 = x - x_mean
+# x2 = x1 / x_std
