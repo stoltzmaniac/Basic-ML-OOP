@@ -84,35 +84,59 @@ class SplitTestTrain(InputData):
 class PreProcessData(SplitTestTrain):
     def __init__(self, predictor_vars, response_var,
                  train_split=0.70, seed=123,
-                 scale=None):
+                 scale_type=None):
         """
-        Split the input data to test / train split to be used in machine learning
-        :param predictor_vars: np.ndarray
-        :param response_var: np.ndarray
-        :param train_split: float percent used as training (Between 0 and 1)
-        :param seed: int for repeatability
-        :param scale: str -> 'normalize', 'standardize', 'min_max', 'scale'
+        Scales the data
+        :param predictor_vars:
+        :param response_var:
+        :param train_split:
+        :param seed:
+        :param scale_type: str -> 'normalize', 'standardize', 'min_max', 'scale'
         """
-        self.scale = scale
-        self.predictor_vars_train_scale = None
+        self.scale_type = scale_type
+        self.predictor_mean = np.mean(self.predictor_vars_train, axis=0)
+        self.predictor_std = np.std(self.predictor_vars_train, axis=0)
+        self.predictor_max = np.max(self.predictor_vars_train, axis=0)
+        self.predictor_min = np.min(self.predictor_vars_train, axis=0)
         super().__init__(predictor_vars, response_var, train_split, seed)
-        self.preprocess()
 
-    def preprocess(self):
-        predictor_mean = np.mean(self.predictor_vars_train, axis=0)
-        predictor_std = np.std(self.predictor_vars_train, axis=0)
-        predictor_max = np.max(self.predictor_vars_train, axis=0)
-        predictor_min = np.min(self.predictor_vars_train, axis=0)
-        if self.scale == 'min_max':
-            self.predictor_vars_train_scale = (self.predictor_vars_train - predictor_min) / (predictor_max - predictor_mean)
-        elif self.scale == 'normalize':
-            self.predictor_vars_train_scale = (self.predictor_vars_train - predictor_mean) / (predictor_max-predictor_min)
-        elif self.scale == 'standardize':
-            self.predictor_vars_train_scale = (self.predictor_vars_train - predictor_mean) / predictor_std
-        elif self.scale == 'scale':
-            self.predictor_vars_train_scale = self.predictor_vars_train - predictor_mean
+        self.predictor_vars_train = self.preprocess(data=self.predictor_vars_train, scale_type=self.scale_type)
+        # Only utilize train data for preprocessing
+        self.predictor_vars_test = self.preprocess(data=self.predictor_vars_test, scale_type=self.scale_type)
+
+        if self.scale_type == 'min_max':
+            self.predictor_vars_train = (self.predictor_vars_train - self.predictor_min) / (self.predictor_max - self.predictor_mean)
+            self.predictor_vars_test = (self.predictor_vars_train - self.predictor_min) / (self.predictor_max - self.predictor_mean)
+        elif self.scale_type == 'normalize':
+            self.predictor_vars_train = (self.predictor_vars_train - self.predictor_mean) / (self.predictor_max - self.predictor_min)
+            self.predictor_vars_test = (self.predictor_vars_train - self.predictor_mean) / (self.predictor_max - self.predictor_min)
+        elif self.scale_type == 'standardize':
+            self.predictor_vars_train = (self.predictor_vars_train - self.predictor_mean) / self.predictor_std
+            self.predictor_vars_test = (self.predictor_vars_train - self.predictor_mean) / self.predictor_std
+        elif self.scale_type == 'scale':
+            self.predictor_vars_train = self.predictor_vars_train - self.predictor_mean
+            self.predictor_vars_test = self.predictor_vars_train - self.predictor_mean
+
+    def preprocess(self, data: np.ndarray, scale_type: str):
+        """
+        Preprocess utilizing training data only. Will need this step for any additional modeling
+        :param data: np.ndarray
+        :param scale_type: str -> 'normalize', 'standardize', 'min_max', 'scale'
+        :return:
+        """
+        if scale_type == 'min_max':
+            scaled_data = (data - self.predictor_min) / (self.predictor_max - self.predictor_mean)
+        elif scale_type == 'normalize':
+            scaled_data = (data - self.predictor_mean) / (self.predictor_max - self.predictor_min)
+        elif scale_type == 'standardize':
+            scaled_data = (data - self.predictor_mean) / self.predictor_std
+        elif scale_type == 'scale':
+            scaled_data = data - self.predictor_mean
         else:
-            self.predictor_vars_train_scale = self.predictor_vars_train
+            scaled_data = data
+        return scaled_data
+
+
 
 
 # #normalize
