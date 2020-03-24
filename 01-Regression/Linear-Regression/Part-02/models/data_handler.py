@@ -83,8 +83,8 @@ class SplitTestTrain(InputData):
 
 class PreProcessData(SplitTestTrain):
     def __init__(self, predictor_vars, response_var,
-                 train_split=0.70, seed=123,
-                 scale_type=None):
+                 scale_type=None,
+                 train_split=0.70, seed=123):
         """
         Scales the data
         :param predictor_vars:
@@ -94,15 +94,15 @@ class PreProcessData(SplitTestTrain):
         :param scale_type: str -> 'normalize', 'standardize', 'min_max', 'scale'
         """
         self.scale_type = scale_type
+        self.pca = False
+        super().__init__(predictor_vars, response_var, train_split, seed)
         self.predictor_mean = np.mean(self.predictor_vars_train, axis=0)
         self.predictor_std = np.std(self.predictor_vars_train, axis=0)
         self.predictor_max = np.max(self.predictor_vars_train, axis=0)
         self.predictor_min = np.min(self.predictor_vars_train, axis=0)
-        super().__init__(predictor_vars, response_var, train_split, seed)
 
-        self.predictor_vars_train = self.preprocess(data=self.predictor_vars_train, scale_type=self.scale_type)
-        # Only utilize train data for preprocessing
-        self.predictor_vars_test = self.preprocess(data=self.predictor_vars_test, scale_type=self.scale_type)
+        self.predictor_vars_train = self.scale(data=self.predictor_vars_train, scale_type=self.scale_type)
+        self.predictor_vars_test = self.scale(data=self.predictor_vars_test, scale_type=self.scale_type)
 
         if self.scale_type == 'min_max':
             self.predictor_vars_train = (self.predictor_vars_train - self.predictor_min) / (self.predictor_max - self.predictor_mean)
@@ -117,7 +117,7 @@ class PreProcessData(SplitTestTrain):
             self.predictor_vars_train = self.predictor_vars_train - self.predictor_mean
             self.predictor_vars_test = self.predictor_vars_train - self.predictor_mean
 
-    def preprocess(self, data: np.ndarray, scale_type: str):
+    def scale(self, data: np.ndarray, scale_type: str):
         """
         Preprocess utilizing training data only. Will need this step for any additional modeling
         :param data: np.ndarray
@@ -135,6 +135,7 @@ class PreProcessData(SplitTestTrain):
         else:
             scaled_data = data
         return scaled_data
+
 
 
 
