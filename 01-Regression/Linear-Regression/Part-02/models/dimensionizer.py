@@ -33,11 +33,12 @@ class PrincipalComponentAnalysis(PreProcessData):
         # Create selected percentage version with cutoff
         eigenvalues_pct = self.eigenvalues_all / np.sum(self.eigenvalues_all)
         self.pct_var_exp_cumulative_all = np.cumsum(eigenvalues_pct)
-        self.eigenvalues = self.pct_var_exp_cumulative_all[self.pct_var_exp_cumulative_all <= 0.95]
-        self.eigenvectors = self.pct_var_exp_cumulative_all[:, :len(self.eigenvalues_all)]
+        self.pct_var_exp_cumulative = self.pct_var_exp_cumulative_all[self.pct_var_exp_cumulative_all <= self.variance_explained_cutoff]
+        self.eigenvectors = self.eigenvectors_all[:, :len(self.pct_var_exp_cumulative_all)]
+        self.eigenvalues = self.eigenvalues_all[:len(self.pct_var_exp_cumulative_all)]
 
     def predict_pca(self, data: np.ndarray):
-        data.dot(self.eigenvectors)
+        return data.dot(self.eigenvectors)
 
 
 
