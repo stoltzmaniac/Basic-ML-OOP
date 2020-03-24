@@ -16,6 +16,7 @@ class PrincipalComponentAnalysis(PreProcessData):
         self.eigenvectors_all = []
         self.eigenvalues = []
         self.eigenvectors = []
+        self.pca_predictor_vars = np.ndarray
         super().__init__(predictor_vars, response_var, scale_type, train_split, seed)
         self.calculate_eigens()
 
@@ -37,9 +38,7 @@ class PrincipalComponentAnalysis(PreProcessData):
         self.eigenvectors = self.eigenvectors_all[:, :len(self.pct_var_exp_cumulative_all)]
         self.eigenvalues = self.eigenvalues_all[:len(self.pct_var_exp_cumulative_all)]
 
-    def predict_pca(self, data: np.ndarray):
-        return data.dot(self.eigenvectors)
-
-
-
-
+    def build(self, data: np.ndarray):
+        ret = data.dot(self.eigenvectors)
+        self.pca_predictor_vars = ret
+        return ret

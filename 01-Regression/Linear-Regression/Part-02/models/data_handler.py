@@ -104,19 +104,6 @@ class PreProcessData(SplitTestTrain):
         self.predictor_vars_train = self.scale(data=self.predictor_vars_train, scale_type=self.scale_type)
         self.predictor_vars_test = self.scale(data=self.predictor_vars_test, scale_type=self.scale_type)
 
-        if self.scale_type == 'min_max':
-            self.predictor_vars_train = (self.predictor_vars_train - self.predictor_min) / (self.predictor_max - self.predictor_mean)
-            self.predictor_vars_test = (self.predictor_vars_train - self.predictor_min) / (self.predictor_max - self.predictor_mean)
-        elif self.scale_type == 'normalize':
-            self.predictor_vars_train = (self.predictor_vars_train - self.predictor_mean) / (self.predictor_max - self.predictor_min)
-            self.predictor_vars_test = (self.predictor_vars_train - self.predictor_mean) / (self.predictor_max - self.predictor_min)
-        elif self.scale_type == 'standardize':
-            self.predictor_vars_train = (self.predictor_vars_train - self.predictor_mean) / self.predictor_std
-            self.predictor_vars_test = (self.predictor_vars_train - self.predictor_mean) / self.predictor_std
-        elif self.scale_type == 'scale':
-            self.predictor_vars_train = self.predictor_vars_train - self.predictor_mean
-            self.predictor_vars_test = self.predictor_vars_train - self.predictor_mean
-
     def scale(self, data: np.ndarray, scale_type: str):
         """
         Preprocess utilizing training data only. Will need this step for any additional modeling
