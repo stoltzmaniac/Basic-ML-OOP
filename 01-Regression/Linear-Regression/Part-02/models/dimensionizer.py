@@ -35,8 +35,8 @@ class PrincipalComponentAnalysis(PreProcessData):
         eigenvalues_pct = self.eigenvalues_all / np.sum(self.eigenvalues_all)
         self.pct_var_exp_cumulative_all = np.cumsum(eigenvalues_pct)
         self.pct_var_exp_cumulative = self.pct_var_exp_cumulative_all[self.pct_var_exp_cumulative_all <= self.variance_explained_cutoff]
-        self.eigenvectors = self.eigenvectors_all[:, :len(self.pct_var_exp_cumulative_all)]
-        self.eigenvalues = self.eigenvalues_all[:len(self.pct_var_exp_cumulative_all)]
+        self.eigenvectors = self.eigenvectors_all[:, :len(self.pct_var_exp_cumulative)]
+        self.eigenvalues = self.eigenvalues_all[:len(self.pct_var_exp_cumulative)]
 
     def build(self, data: np.ndarray):
         ret = data.dot(self.eigenvectors)
