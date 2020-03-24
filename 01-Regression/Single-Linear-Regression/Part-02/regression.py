@@ -25,7 +25,7 @@ class SingleLinearRegression:
         return np.mean(self.dependent_var)
 
     def fit(self):
-        # Format: independent_var_hat = b1*dependent_var + b0
+        # Format: independent_var_hat = b1*response_var + b0
         x_minus_mean = [x - self.independent_var_mean for x in self.independent_var]
         y_minus_mean = [y - self.dependent_var_mean for y in self.dependent_var]
         b1_numerator = sum([x * y for x, y in zip(x_minus_mean, y_minus_mean)])

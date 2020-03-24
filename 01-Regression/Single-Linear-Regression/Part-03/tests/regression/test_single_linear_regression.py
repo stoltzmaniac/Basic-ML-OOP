@@ -6,8 +6,8 @@ from models.regression import LinearRegression as SingleLinearRegression
 
 @pytest.fixture(scope='module')
 def reg_model(single_linear_regression_data):
-    linear_regression_model = SingleLinearRegression(independent_vars=single_linear_regression_data['independent_vars'],
-                                                     dependent_var=single_linear_regression_data['dependent_var'],
+    linear_regression_model = SingleLinearRegression(independent_vars=single_linear_regression_data['predictor_vars'],
+                                                     response_var=single_linear_regression_data['response_var'],
                                                      learning_rate=0.01,
                                                      train_split=0.7,
                                                      seed=123)
@@ -19,8 +19,8 @@ def test_single_linear_regression_data_passing_correctly(reg_model, single_linea
     Setup linear regression model
     :return:
     """
-    #assert(reg_model.independent_vars_train.all() == single_linear_regression_data['independent_vars'].all())
-    #assert(reg_model.dependent_var.all() == single_linear_regression_data['dependent_var'].all())
+    #assert(reg_model.independent_vars_train.all() == single_linear_regression_data['predictor_vars'].all())
+    #assert(reg_model.response_var.all() == single_linear_regression_data['response_var'].all())
     assert(type(reg_model.independent_vars_train) == np.ndarray)
     assert(type(reg_model.dependent_var_train) == np.ndarray)
 

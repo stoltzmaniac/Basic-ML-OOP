@@ -11,7 +11,7 @@ def single_linear_regression_data() -> dict:
     """
     df = pd.read_csv('my_test_data/my_test_data.csv')
     yield {
-        'dependent_var': np.array(df['dependent_var']),
+        'response_var': np.array(df['response_var']),
         'independent_var': np.array(df['independent_var'])
     }
     return print('single_linear_regression_data fixture finished.')
