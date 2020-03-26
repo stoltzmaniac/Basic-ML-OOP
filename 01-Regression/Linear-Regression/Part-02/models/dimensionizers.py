@@ -12,7 +12,7 @@ class PrincipalComponentAnalysis(PreProcessData):
         Returns object with PCA matrix and can be used to predict
         :param variance_explained_cutoff: float with value between 0 and 1, max cumulative variance explained cutoff
         """
-        super().__init__(predictor_vars, response_var, train_split, seed, scale_type)
+        super().__init__(predictor_vars=predictor_vars, response_var=response_var, train_split=train_split, seed=seed, scale_type=scale_type)
 
         self.variance_explained_cutoff = variance_explained_cutoff
         self.eigenvalues_all = []

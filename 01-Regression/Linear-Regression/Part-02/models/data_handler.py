@@ -61,14 +61,14 @@ class InputData(InputBase):
 
 
 class SplitTestTrain(InputData):
-    def __init__(self, predictor_vars, response_var, train_split: float, seed: int = 5):
+    def __init__(self, predictor_vars, response_var, train_split: float, seed: int):
         """
         Split the input data to test / train split to be used in machine learning
         :param train_split: float percent used as training (Between 0 and 1)
         :param seed: int for repeatability
         """
 
-        super().__init__(predictor_vars, response_var)
+        super().__init__(predictor_vars=predictor_vars, response_var=response_var)
 
         self.seed = seed
         self.train_split = train_split
@@ -97,14 +97,14 @@ class SplitTestTrain(InputData):
 
 class PreProcessData(SplitTestTrain):
     def __init__(self, predictor_vars, response_var,
-                 train_split, scale_type: str, seed = 5):
+                 train_split, seed, scale_type: str):
         # TODO: add something to handle for categorical variables
         """
         Scales the data
         :param scale_type: str -> 'normalize', 'standardize', 'min_max', 'scale'
         """
 
-        super().__init__(predictor_vars, response_var, train_split, seed)
+        super().__init__(predictor_vars=predictor_vars, response_var=response_var, train_split=train_split, seed=seed)
 
         self.scale_type = scale_type
 

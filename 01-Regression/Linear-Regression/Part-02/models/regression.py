@@ -16,7 +16,7 @@ class Regression(PreProcessData):
         :param learning_rate: float utilized in gradient descent between 0 and 1, usually extremely small
         """
 
-        super().__init__(predictor_vars, response_var, train_split, seed, scale_type)
+        super().__init__(predictor_vars=predictor_vars, response_var=response_var, train_split=train_split, seed=seed, scale_type=scale_type)
 
         self.learning_rate = learning_rate
 
