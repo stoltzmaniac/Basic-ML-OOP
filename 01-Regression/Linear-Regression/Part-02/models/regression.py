@@ -18,9 +18,10 @@ class Regression(PreProcessData):
         :param train_split: float (0 < value < 1)
         :param seed: int
         """
-        super().__init__(predictor_vars, response_var, train_split, seed, scale_type)
 
         self.learning_rate = learning_rate
+
+        super().__init__(predictor_vars, response_var, train_split, seed, scale_type)
 
         if not type(self.learning_rate) == float:
             raise ValueError(f"learning_rate not a float")

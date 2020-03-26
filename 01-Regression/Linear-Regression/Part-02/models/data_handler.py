@@ -19,10 +19,10 @@ class InputData(InputBase):
         :param response_var: np.array (one dimensional)
         """
 
-        super().__init__()
-
         self.predictor_vars = self.convert_dataframe_to_array(predictor_vars)
         self.response_var = self.convert_dataframe_to_array(response_var)
+
+        super().__init__()
 
         if self.response_var.shape[0] != self.predictor_vars.shape[0]:
             raise ValueError(
@@ -61,19 +61,17 @@ class InputData(InputBase):
 
 
 class SplitTestTrain(InputData):
-    def __init__(self, predictor_vars, response_var, train_split, seed):
+    def __init__(self, predictor_vars, response_var, train_split: float, seed: int):
         """
         Split the input data to test / train split to be used in machine learning
-        :param predictor_vars: np.ndarray
-        :param response_var: np.ndarray
         :param train_split: float percent used as training (Between 0 and 1)
         :param seed: int for repeatability
         """
 
-        super().__init__(predictor_vars, response_var)
-
         self.seed = seed
         self.train_split = train_split
+
+        super().__init__(predictor_vars, response_var)
 
         if type(self.seed) != int:
             raise ValueError(f"seed value not an int, it is {self.seed}")
@@ -99,20 +97,16 @@ class SplitTestTrain(InputData):
 
 class PreProcessData(SplitTestTrain):
     def __init__(self, predictor_vars, response_var,
-                 train_split, seed, scale_type):
+                 train_split, seed, scale_type: str):
         # TODO: add something to handle for categorical variables
         """
         Scales the data
-        :param predictor_vars:
-        :param response_var:
-        :param train_split:
-        :param seed:
         :param scale_type: str -> 'normalize', 'standardize', 'min_max', 'scale'
         """
 
-        super().__init__(predictor_vars, response_var, train_split, seed)
-
         self.scale_type = scale_type
+
+        super().__init__(predictor_vars, response_var, train_split, seed)
 
         if self.scale_type not in ['normalize', 'standardize', 'min_max', 'scale']:
             if self.scale_type:
