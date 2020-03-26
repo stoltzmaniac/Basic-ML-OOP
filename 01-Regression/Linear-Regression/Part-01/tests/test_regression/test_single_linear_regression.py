@@ -1,14 +1,14 @@
 import numpy as np
 import pytest
 
-from models.regression import LinearRegression
+from regression import LinearRegression
 
 
 @pytest.fixture(scope="module")
 def single_linear_regression_model(single_linear_regression_data):
     linear_regression_model = LinearRegression(
-        independent_vars=single_linear_regression_data["predictor_vars"],
-        response_var=single_linear_regression_data["response_var"],
+        independent_vars=single_linear_regression_data["independent_vars"],
+        dependent_var=single_linear_regression_data["dependent_var"],
         iterations=10000,
         learning_rate=0.001,
         train_split=0.7,
@@ -26,11 +26,11 @@ def test_single_linear_regression_data_passing_correctly(
     """
     assert (
         single_linear_regression_model.independent_vars_train.all()
-        == single_linear_regression_data["predictor_vars"].all()
+        == single_linear_regression_data["independent_vars"].all()
     )
     assert (
         single_linear_regression_model.dependent_var_train.all()
-        == single_linear_regression_data["response_var"].all()
+        == single_linear_regression_data["dependent_var"].all()
     )
     assert type(single_linear_regression_model.independent_vars_train) == np.ndarray
     assert type(single_linear_regression_model.dependent_var_train) == np.ndarray

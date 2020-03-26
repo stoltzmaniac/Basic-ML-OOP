@@ -1,6 +1,6 @@
-# All models for modeling
 import numpy as np
 import matplotlib.pyplot as plt
+
 
 class Regression:
     def __init__(
@@ -11,7 +11,6 @@ class Regression:
         learning_rate: float,
         train_split: float,
         seed: int,
-        plot_style: str
     ):
         """
         :param predictor_vars: np.ndarray
@@ -20,13 +19,10 @@ class Regression:
         :param learning_rate: float
         :param train_split: float (0 < value < 1)
         :param seed: int
-        :param plot_style: str (ex. 'fivethirtyeight')
         """
         # Check data types
         if type(seed) != int:
             raise ValueError(f"seed value not an int")
-        if type(plot_style) != str:
-            raise ValueError(f"plot_style not a str")
         if type(iterations) != int or iterations <= 0:
             raise ValueError(f"Invalid iterations value")
         type_check_arrays = [
@@ -45,8 +41,6 @@ class Regression:
             raise ValueError(
                 f"Dimension(s) of data for Regression class are not accurate"
             )
-
-        plt.style.use(plot_style)
 
         all_data = np.column_stack((predictor_vars, response_var))
         all_data = all_data.astype("float")
@@ -69,6 +63,9 @@ class Regression:
         self.iterations = iterations
         self.cost = []
 
+    def plot(self):
+        pass
+
 
 class LinearRegression(Regression):
     def __init__(
@@ -79,7 +76,10 @@ class LinearRegression(Regression):
         learning_rate,
         train_split,
         seed,
-        plot_style,
+        tolerance,
+        batch_size,
+        max_epochs,
+        decay,
     ):
         """
         All inherited from Regression class
@@ -91,7 +91,6 @@ class LinearRegression(Regression):
             learning_rate,
             train_split,
             seed,
-            plot_style,
         )
 
         # Add ones column to allow for beta 0
@@ -99,6 +98,7 @@ class LinearRegression(Regression):
             np.ones(len(self.predictor_vars_train), dtype="int64"),
             self.predictor_vars_train,
         ]
+
         self.predictor_vars_test = np.c_[
             np.ones(len(self.predictor_vars_test), dtype="int64"),
             self.predictor_vars_test,
@@ -106,33 +106,68 @@ class LinearRegression(Regression):
 
         # Initialize betas
         if len(self.predictor_vars_train.shape) == 1:
-            self.B = np.zeros(1)
+            self.B = np.random.randn(1)
         else:
-            self.B = np.zeros(self.predictor_vars_train.shape[1])
+            self.B = np.random.randn(self.predictor_vars_train.shape[1])
+
+        self.max_epochs = max_epochs
+        self.decay = decay
+        self.tolerance = tolerance
+        self.batch_size = batch_size
 
         # Automatically fit
-        self.fit_gradient_descent()
+        #self.fit_gradient_descent()
 
     def predict(self, values_to_predict: np.ndarray):
+        data = np.c_[np.ones(len(values_to_predict), dtype="int64"),
+              values_to_predict]
+        predicted_values = data.dot(self.B).flatten()
+        return predicted_values
+
+    def predict_(self, values_to_predict: np.ndarray):
         predicted_values = values_to_predict.dot(self.B).flatten()
         return predicted_values
 
-    def find_gradient(self):
-        estimate = self.predict(self.predictor_vars_train)
-        error = self.response_var_train.flatten() - estimate
-        gradient = -(1.0 / len(self.predictor_vars_train)) * error.dot(
-            self.predictor_vars_train
-        )
-        self.cost.append(np.power(error, 2))
-        return gradient
+    def find_gradient(self, x, y):
+        estimate = self.predict_(values_to_predict=x)
+        error = (y.flatten() - estimate)
+        mse = (1.0 / len(x)) * np.sum(np.power(error, 2))
+        gradient = -(1.0 / len(x)) * error.dot(x)
+        return {'gradient': gradient, 'error': mse}
 
-    def fit_gradient_descent(self):
-        for i in range(self.iterations):
-            gradient = self.find_gradient()
-            self.B = self.B - (self.learning_rate * gradient)
+    def fit_stochastic_gradient_descent(self):
+        epoch = 0
+        error = 1
+        while True:
+            order = np.random.permutation(len(self.predictor_vars_train))
+            self.predictor_vars_train = self.predictor_vars_train[order]
+            self.response_var_train = self.response_var_train[order]
+            b = 0
+            while b < len(self.predictor_vars_train):
+                tx = self.predictor_vars_train[b: b + self.batch_size]
+                ty = self.response_var_train[b: b + self.batch_size]
+                gradient_data = self.find_gradient(x=tx, y=ty)
+                gradient = gradient_data['gradient']
+                error = gradient_data['error']
+                self.B -= self.learning_rate * gradient
+                b += self.batch_size
+
+            if epoch % 100 == 0:
+                epoch_gradient = self.find_gradient(self.predictor_vars_train, self.response_var_train)
+                print(f"Epoch: {epoch} - Error: {epoch_gradient['error']}")
+                print(abs(error - epoch_gradient['error']))
+                if abs(error - epoch_gradient['error']) < self.tolerance:
+                    print('Converged')
+                    break
+                if epoch >= self.max_epochs:
+                    print('Max Epochs limit reached')
+                    break
+
+            epoch += 1
+            self.learning_rate = self.learning_rate * (self.decay ** int(epoch / 1000))
 
     def calculate_r_squared(self, predictor_vars, response_var):
-        sum_sq_r = np.sum((response_var - self.predict(predictor_vars)) ** 2)
+        sum_sq_r = np.sum((response_var - self.predict_(predictor_vars)) ** 2)
         sum_sq_t = np.sum((response_var - response_var.mean()) ** 2)
         return 1 - (sum_sq_r / sum_sq_t)
 
@@ -140,32 +175,32 @@ class LinearRegression(Regression):
              title=None, x_label=None, y_label=None):
         # If plot min / max not given, define based off of min and max of data
         for i in range(self.predictor_vars_train.shape[1]-1):
-            inresponse_var_train = self.predictor_vars_train[:, i+1]
-            inresponse_var_test = self.predictor_vars_test[:, i+1]
+            predictor_var_train = self.predictor_vars_train[:, i+1]
+            predictor_var_test = self.predictor_vars_test[:, i+1]
             response_var_train = self.response_var_train[:, 0]
             response_var_test = self.response_var_test[:, 0]
 
             # # Set min/max axes
-            min_predictor_vars = min(np.min(inresponse_var_train), np.min(inresponse_var_test))
-            max_predictor_vars = max(np.max(inresponse_var_train), np.max(inresponse_var_test))
+            min_predictor_vars = min(np.min(predictor_var_train), np.min(predictor_var_test))
+            max_predictor_vars = max(np.max(predictor_var_train), np.max(predictor_var_train))
             min_response_vars = min(np.min(response_var_train), np.min(response_var_test))
             max_response_vars = max(np.max(response_var_train), np.max(response_var_test))
 
             # # Set x-axis range
-            # predictor_vars_hat = np.linspace(min_predictor_vars, max_predictor_vars, increment)
-            # response_var_hat = self.predict(predictor_vars_hat)
+            predictor_vars_hat = np.linspace(min_predictor_vars, max_predictor_vars, increment)
+            #response_var_hat = self.predict(predictor_vars_hat)
 
-            plot_data_train = np.c_[inresponse_var_train, self.predict(self.predictor_vars_train)]
+            plot_data_train = np.c_[predictor_vars_hat, self.predict(predictor_vars_hat)]
             plot_data_train.sort(axis=0)
 
             # Plot regression line
             plt.plot(plot_data_train[:, 0], plot_data_train[:, 1], color='red')
 
             # Plot train points
-            plt.scatter(inresponse_var_train, response_var_train, color='green')
+            plt.scatter(predictor_var_train, response_var_train, color='green')
 
             # Plot test points
-            plt.scatter(inresponse_var_test, response_var_test, color='blue')
+            plt.scatter(predictor_var_test, response_var_test, color='blue')
 
             plt.text(x=min_predictor_vars * 1.1, y=max_response_vars * 0.9,
                      bbox=dict(),
@@ -183,3 +218,190 @@ class LinearRegression(Regression):
             R^2 Train: {self.calculate_r_squared(self.predictor_vars_train, self.response_var_train[:, 0])}
             R^2 Test: {self.calculate_r_squared(self.predictor_vars_test, self.response_var_test[:, 0])}
             """
+
+
+# All models for modeling
+# import numpy as np
+# import matplotlib.pyplot as plt
+# 
+# class Regression:
+#     def __init__(
+#         self,
+#         predictor_vars: np.ndarray,
+#         response_var: np.ndarray,
+#         iterations: int,
+#         learning_rate: float,
+#         train_split: float,
+#         seed: int,
+#         plot_style: str
+#     ):
+#         """
+#         :param predictor_vars: np.ndarray
+#         :param response_var: np.array (one dimensional)
+#         :param iterations: int
+#         :param learning_rate: float
+#         :param train_split: float (0 < value < 1)
+#         :param seed: int
+#         :param plot_style: str (ex. 'fivethirtyeight')
+#         """
+#         # Check data types
+#         if type(seed) != int:
+#             raise ValueError(f"seed value not an int")
+#         if type(plot_style) != str:
+#             raise ValueError(f"plot_style not a str")
+#         if type(iterations) != int or iterations <= 0:
+#             raise ValueError(f"Invalid iterations value")
+#         type_check_arrays = [
+#             type(predictor_vars) == np.ndarray,
+#             type(response_var) == np.ndarray,
+#         ]
+#         if not all(type_check_arrays):
+#             raise ValueError(f"Type(s) of data for Regression class are not accurate")
+#         if (
+#             not type(learning_rate) == float
+#             and type(train_split) == float
+#             and train_split <= 1
+#         ):
+#             raise ValueError(f"learning_rate or train_split not acceptable input(s)")
+#         if response_var.shape[0] != predictor_vars.shape[0]:
+#             raise ValueError(
+#                 f"Dimension(s) of data for Regression class are not accurate"
+#             )
+# 
+#         plt.style.use(plot_style)
+# 
+#         all_data = np.column_stack((predictor_vars, response_var))
+#         all_data = all_data.astype("float")
+#         np.random.seed(seed)
+#         np.random.shuffle(all_data)
+# 
+#         split_row = round(all_data.shape[0] * train_split)
+#         train_data = all_data[:split_row]
+#         test_data = all_data[split_row:]
+# 
+#         # Train
+#         self.predictor_vars_train = train_data[:, :-1]
+#         self.response_var_train = train_data[:, -1:]
+# 
+#         # Test
+#         self.predictor_vars_test = test_data[:, :-1]
+#         self.response_var_test = test_data[:, -1:]
+# 
+#         self.learning_rate = learning_rate
+#         self.iterations = iterations
+#         self.cost = []
+# 
+# 
+# class LinearRegression(Regression):
+#     def __init__(
+#         self,
+#         predictor_vars,
+#         response_var,
+#         iterations,
+#         learning_rate,
+#         train_split,
+#         seed,
+#         plot_style,
+#     ):
+#         """
+#         All inherited from Regression class
+#         """
+#         super().__init__(
+#             predictor_vars,
+#             response_var,
+#             iterations,
+#             learning_rate,
+#             train_split,
+#             seed,
+#             plot_style,
+#         )
+# 
+#         # Add ones column to allow for beta 0
+#         self.predictor_vars_train = np.c_[
+#             np.ones(len(self.predictor_vars_train), dtype="int64"),
+#             self.predictor_vars_train,
+#         ]
+#         self.predictor_vars_test = np.c_[
+#             np.ones(len(self.predictor_vars_test), dtype="int64"),
+#             self.predictor_vars_test,
+#         ]
+# 
+#         # Initialize betas
+#         if len(self.predictor_vars_train.shape) == 1:
+#             self.B = np.zeros(1)
+#         else:
+#             self.B = np.zeros(self.predictor_vars_train.shape[1])
+# 
+#         # Automatically fit
+#         self.fit_gradient_descent()
+# 
+#     def predict(self, values_to_predict: np.ndarray):
+#         predicted_values = values_to_predict.dot(self.B).flatten()
+#         return predicted_values
+# 
+#     def find_gradient(self):
+#         estimate = self.predict(self.predictor_vars_train)
+#         error = self.response_var_train.flatten() - estimate
+#         gradient = -(1.0 / len(self.predictor_vars_train)) * error.dot(
+#             self.predictor_vars_train
+#         )
+#         self.cost.append(np.power(error, 2))
+#         return gradient
+# 
+#     def fit_gradient_descent(self):
+#         for i in range(self.iterations):
+#             gradient = self.find_gradient()
+#             self.B = self.B - (self.learning_rate * gradient)
+# 
+#     def calculate_r_squared(self, predictor_vars, response_var):
+#         sum_sq_r = np.sum((response_var - self.predict(predictor_vars)) ** 2)
+#         sum_sq_t = np.sum((response_var - response_var.mean()) ** 2)
+#         return 1 - (sum_sq_r / sum_sq_t)
+# 
+#     def plot(self, increment=100,
+#              title=None, x_label=None, y_label=None):
+#         # If plot min / max not given, define based off of min and max of data
+#         for i in range(self.predictor_vars_train.shape[1]-1):
+#             response_var_train = self.predictor_vars_train[:, i+1]
+#             inresponse_var_test = self.predictor_vars_test[:, i+1]
+#             response_var_train = self.response_var_train[:, 0]
+#             response_var_test = self.response_var_test[:, 0]
+#
+#             # # Set min/max axes
+#             min_predictor_vars = min(np.min(response_var_train), np.min(inresponse_var_test))
+#             max_predictor_vars = max(np.max(response_var_train), np.max(inresponse_var_test))
+#             min_response_vars = min(np.min(response_var_train), np.min(response_var_test))
+#             max_response_vars = max(np.max(response_var_train), np.max(response_var_test))
+#
+#             # # Set x-axis range
+#             # predictor_vars_hat = np.linspace(min_predictor_vars, max_predictor_vars, increment)
+#             # response_var_hat = self.predict(predictor_vars_hat)
+#
+#             plot_data_train = np.c_[response_var_train, self.predict(self.predictor_vars_train)]
+#             plot_data_train.sort(axis=0)
+#
+#             # Plot regression line
+#             plt.plot(plot_data_train[:, 0], plot_data_train[:, 1], color='red')
+#
+#             # Plot train points
+#             plt.scatter(response_var_train, response_var_train, color='green')
+#
+#             # Plot test points
+#             plt.scatter(inresponse_var_test, response_var_test, color='blue')
+#
+#             plt.text(x=min_predictor_vars * 1.1, y=max_response_vars * 0.9,
+#                      bbox=dict(),
+#                      s=f'')
+#             plt.xlabel(x_label)
+#             plt.ylabel(y_label)
+#             plt.title(title)
+#             plt.show()
+# 
+#     def __str__(self):
+#         return f"""
+#             Model Results
+#             -------------
+#             Betas: {[i for i in zip(range(len(self.B)), self.B)]}
+#             R^2 Train: {self.calculate_r_squared(self.predictor_vars_train, self.response_var_train[:, 0])}
+#             R^2 Test: {self.calculate_r_squared(self.predictor_vars_test, self.response_var_test[:, 0])}
+#             """

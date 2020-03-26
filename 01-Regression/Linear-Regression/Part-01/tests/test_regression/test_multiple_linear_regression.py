@@ -1,14 +1,14 @@
 import numpy as np
 import pytest
 
-from models.regression import LinearRegression
+from regression import LinearRegression
 
 
 @pytest.fixture(scope="module")
 def multiple_linear_regression_model(multiple_linear_regression_data):
     linear_regression_model = LinearRegression(
-        independent_vars=multiple_linear_regression_data["predictor_vars"],
-        response_var=multiple_linear_regression_data["response_var"],
+        independent_vars=multiple_linear_regression_data["independent_vars"],
+        dependent_var=multiple_linear_regression_data["dependent_var"],
         iterations=10000,
         learning_rate=0.001,
         train_split=0.7,
@@ -26,11 +26,11 @@ def test_multiple_linear_regression_data_passing_correctly(
     """
     assert (
         multiple_linear_regression_model.independent_vars_train.all()
-        == multiple_linear_regression_data["predictor_vars"].all()
+        == multiple_linear_regression_data["independent_vars"].all()
     )
     assert (
         multiple_linear_regression_model.dependent_var_train.all()
-        == multiple_linear_regression_data["response_var"].all()
+        == multiple_linear_regression_data["dependent_var"].all()
     )
     assert type(multiple_linear_regression_model.independent_vars_train) == np.ndarray
     assert type(multiple_linear_regression_model.dependent_var_train) == np.ndarray

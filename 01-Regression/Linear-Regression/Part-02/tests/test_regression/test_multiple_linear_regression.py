@@ -7,12 +7,13 @@ from models.regression import LinearRegression
 @pytest.fixture(scope="module")
 def multiple_linear_regression_model(multiple_linear_regression_data):
     linear_regression_model = LinearRegression(
-        independent_vars=multiple_linear_regression_data["predictor_vars"],
+        predictor_vars=multiple_linear_regression_data["predictor_vars"],
         response_var=multiple_linear_regression_data["response_var"],
         iterations=10000,
         learning_rate=0.001,
         train_split=0.7,
         seed=123,
+        plot_style='fivethirtyeight'
     )
     return linear_regression_model
 
@@ -25,15 +26,15 @@ def test_multiple_linear_regression_data_passing_correctly(
     :return:
     """
     assert (
-        multiple_linear_regression_model.independent_vars_train.all()
+        multiple_linear_regression_model.predictor_vars_train.all()
         == multiple_linear_regression_data["predictor_vars"].all()
     )
     assert (
-        multiple_linear_regression_model.dependent_var_train.all()
+        multiple_linear_regression_model.response_var_train.all()
         == multiple_linear_regression_data["response_var"].all()
     )
-    assert type(multiple_linear_regression_model.independent_vars_train) == np.ndarray
-    assert type(multiple_linear_regression_model.dependent_var_train) == np.ndarray
+    assert type(multiple_linear_regression_model.predictor_vars_train) == np.ndarray
+    assert type(multiple_linear_regression_model.response_var_train) == np.ndarray
 
 
 def test_multiple_linear_regression_coefficients(multiple_linear_regression_model):
@@ -63,13 +64,13 @@ def test_multiple_linear_regression_r_squared(multiple_linear_regression_model):
     """
     # Train Data
     train_r_squared = multiple_linear_regression_model.calculate_r_squared(
-        multiple_linear_regression_model.independent_vars_train,
-        multiple_linear_regression_model.dependent_var_train[:, 0],
+        multiple_linear_regression_model.predictor_vars_train,
+        multiple_linear_regression_model.response_var_train[:, 0],
     )
 
     test_r_squared = multiple_linear_regression_model.calculate_r_squared(
-        multiple_linear_regression_model.independent_vars_test,
-        multiple_linear_regression_model.dependent_var_test[:, 0],
+        multiple_linear_regression_model.predictor_vars_test,
+        multiple_linear_regression_model.response_var_test[:, 0],
     )
 
     assert pytest.approx(train_r_squared, 0.001) == 0.5179372162803452

@@ -11,8 +11,8 @@ def single_linear_regression_data() -> dict:
     """
     df = pd.read_csv("my_test_data/my_test_data.csv")
     yield {
-        "response_var": np.array(df)[:, -1],
-        "predictor_vars": np.array(df)[:, :1],
+        "dependent_var": np.array(df)[:, -1],
+        "independent_vars": np.array(df)[:, :1],
     }
     return print("single_linear_regression_data fixture finished.")
 
@@ -25,7 +25,7 @@ def multiple_linear_regression_data() -> dict:
     """
     df = pd.read_csv("my_test_data/my_test_data_2.csv")
     yield {
-        "response_var": np.array(df)[:, -1],
-        "predictor_vars": np.array(df)[:, :3],
+        "dependent_var": np.array(df)[:, -1],
+        "independent_vars": np.array(df)[:, :3],
     }
     return print("multiple_linear_regression_data fixture finished.")

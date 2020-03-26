@@ -3,6 +3,7 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/01-Regression/Linear-Regression/Part-02" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/01-Regression/Linear-Regression/Part-01" isTestSource="false" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.7 (Basic-ML-OOP-Fresh)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
