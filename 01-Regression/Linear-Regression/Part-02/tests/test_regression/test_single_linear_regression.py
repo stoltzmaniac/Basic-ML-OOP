@@ -6,32 +6,36 @@ from models.regression import LinearRegression
 
 @pytest.fixture(scope="module")
 def single_linear_regression_model(single_linear_regression_data):
-    linear_regression_model = LinearRegression(
-        predictor_vars=single_linear_regression_data["predictor_vars"],
-        response_var=single_linear_regression_data["response_var"],
-        iterations=10000,
-        learning_rate=0.001,
-        train_split=0.7,
-        seed=123,
-        plot_style='fivethirtyeight'
-    )
-    return linear_regression_model
+    linear_regression = LinearRegression(predictor_vars=single_linear_regression_data["predictor_vars"],
+                                         response_var=single_linear_regression_data["response_var"],
+                                         train_split=0.7,
+                                         seed=123,
+                                         scale_type='normalize',
+                                         learning_rate=0.01,
+                                         tolerance=0.00001,
+                                         batch_size=12,
+                                         max_epochs=1000,
+                                         decay=0.90)
+
+    linear_regression.fit_stochastic_gradient_descent()
+    print(linear_regression)
+    return linear_regression
 
 
 def test_single_linear_regression_data_passing_correctly(
-    single_linear_regression_model, single_linear_regression_data
+        single_linear_regression_model, single_linear_regression_data
 ):
     """
     Setup linear regression model
     :return:
     """
     assert (
-        single_linear_regression_model.predictor_vars_train.all()
-        == single_linear_regression_data["predictor_vars"].all()
+            single_linear_regression_model.predictor_vars_train.all()
+            == single_linear_regression_data["predictor_vars"].all()
     )
     assert (
-        single_linear_regression_model.response_var_train.all()
-        == single_linear_regression_data["response_var"].all()
+            single_linear_regression_model.response_var_train.all()
+            == single_linear_regression_data["response_var"].all()
     )
     assert type(single_linear_regression_model.predictor_vars_train) == np.ndarray
     assert type(single_linear_regression_model.response_var_train) == np.ndarray
@@ -43,12 +47,12 @@ def test_single_linear_regression_coefficients(single_linear_regression_model):
     :return:
     """
     print(single_linear_regression_model)
-    expected_coefficients = [(0, 2), (1, 2)]
+    expected_coefficients = [(0, 151.27), (1, 303.90)]
     no_of_betas = len(single_linear_regression_model.B)
     for n in range(no_of_betas):
         assert (
-            single_linear_regression_model.B[n] ==
-            pytest.approx(expected_coefficients[n][1], 0.001)
+                single_linear_regression_model.B[n] ==
+                pytest.approx(expected_coefficients[n][1], 0.001)
         )
 
 
