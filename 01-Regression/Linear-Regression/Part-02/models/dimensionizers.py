@@ -3,16 +3,26 @@ from models.data_handler import PreProcessData
 
 
 class PrincipalComponentAnalysis(PreProcessData):
-    def __init__(self, predictor_vars, response_var,
-                 train_split,
-                 seed,
-                 scale_type,
-                 variance_explained_cutoff: float):
+    def __init__(
+        self,
+        predictor_vars,
+        response_var,
+        train_split,
+        seed,
+        scale_type,
+        variance_explained_cutoff: float,
+    ):
         """
         Returns object with PCA matrix and can be used to predict
         :param variance_explained_cutoff: float with value between 0 and 1, max cumulative variance explained cutoff
         """
-        super().__init__(predictor_vars=predictor_vars, response_var=response_var, train_split=train_split, seed=seed, scale_type=scale_type)
+        super().__init__(
+            predictor_vars=predictor_vars,
+            response_var=response_var,
+            train_split=train_split,
+            seed=seed,
+            scale_type=scale_type,
+        )
 
         self.variance_explained_cutoff = variance_explained_cutoff
         self.eigenvalues_all = []
@@ -21,8 +31,13 @@ class PrincipalComponentAnalysis(PreProcessData):
         self.eigenvectors = []
         self.pca_predictor_vars = np.ndarray
 
-        if type(self.variance_explained_cutoff) != float or not 0 < self.variance_explained_cutoff < 1:
-            raise ValueError(f"variance_explained_cutoff needs to be a float between 0 and 1, it is {self.variance_explained_cutoff}")
+        if (
+            type(self.variance_explained_cutoff) != float
+            or not 0 < self.variance_explained_cutoff < 1
+        ):
+            raise ValueError(
+                f"variance_explained_cutoff needs to be a float between 0 and 1, it is {self.variance_explained_cutoff}"
+            )
 
         self.calculate_eigens()
 
@@ -40,9 +55,11 @@ class PrincipalComponentAnalysis(PreProcessData):
         # Create selected percentage version with cutoff
         eigenvalues_pct = self.eigenvalues_all / np.sum(self.eigenvalues_all)
         self.pct_var_exp_cumulative_all = np.cumsum(eigenvalues_pct)
-        self.pct_var_exp_cumulative = self.pct_var_exp_cumulative_all[self.pct_var_exp_cumulative_all <= self.variance_explained_cutoff]
-        self.eigenvectors = self.eigenvectors_all[:, :len(self.pct_var_exp_cumulative)]
-        self.eigenvalues = self.eigenvalues_all[:len(self.pct_var_exp_cumulative)]
+        self.pct_var_exp_cumulative = self.pct_var_exp_cumulative_all[
+            self.pct_var_exp_cumulative_all <= self.variance_explained_cutoff
+        ]
+        self.eigenvectors = self.eigenvectors_all[:, : len(self.pct_var_exp_cumulative)]
+        self.eigenvalues = self.eigenvalues_all[: len(self.pct_var_exp_cumulative)]
 
     def build(self, data: np.ndarray):
         """

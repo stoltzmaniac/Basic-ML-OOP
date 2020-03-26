@@ -38,7 +38,9 @@ class InputData(InputBase):
         :param df_or_series:
         :return: np.array
         """
-        if isinstance(df_or_series, pd.DataFrame) or isinstance(df_or_series, pd.Series):
+        if isinstance(df_or_series, pd.DataFrame) or isinstance(
+            df_or_series, pd.Series
+        ):
             dat = np.array(df_or_series)
             if len(dat.shape) == 1:
                 return dat[:, np.newaxis]
@@ -47,17 +49,21 @@ class InputData(InputBase):
         if isinstance(df_or_series, np.ndarray):
             return df_or_series
         else:
-            raise TypeError(f"InputData error:\n"
-                            f"type should be of np.ndarray and is currently type: {type(df_or_series)}")
+            raise TypeError(
+                f"InputData error:\n"
+                f"type should be of np.ndarray and is currently type: {type(df_or_series)}"
+            )
 
     def __str__(self):
-        return f'-----First 10 Rows----\n' \
-               f'Independent Variables:\n' \
-               f'{self.predictor_vars[0:10,]}\n' \
-               f'-----------------------\n' \
-               f'Dependent Variable:\n' \
-               f'{self.response_var[0:10,]}\n' \
-               f'-----------------------\n'
+        return (
+            f"-----First 10 Rows----\n"
+            f"Independent Variables:\n"
+            f"{self.predictor_vars[0:10,]}\n"
+            f"-----------------------\n"
+            f"Dependent Variable:\n"
+            f"{self.response_var[0:10,]}\n"
+            f"-----------------------\n"
+        )
 
 
 class SplitTestTrain(InputData):
@@ -78,7 +84,9 @@ class SplitTestTrain(InputData):
         if not type(self.train_split) == float:
             raise ValueError(f"train_split not a float, it is {self.train_split}")
         if not 0 < self.train_split < 1:
-            raise ValueError(f"train_split must be between 0 and 1 (not including), it is {self.train_split}")
+            raise ValueError(
+                f"train_split must be between 0 and 1 (not including), it is {self.train_split}"
+            )
 
         self.split_data()
 
@@ -91,26 +99,40 @@ class SplitTestTrain(InputData):
         indices = np.random.permutation(self.predictor_vars.shape[0])
         split_row = round(self.predictor_vars.shape[0] * self.train_split)
         train_idx, test_idx = indices[:split_row], indices[split_row:]
-        self.predictor_vars_train, self.predictor_vars_test = self.predictor_vars[train_idx, :], self.predictor_vars[test_idx, :]
-        self.response_var_train, self.response_var_test = self.response_var[train_idx], self.response_var[test_idx]
+        self.predictor_vars_train, self.predictor_vars_test = (
+            self.predictor_vars[train_idx, :],
+            self.predictor_vars[test_idx, :],
+        )
+        self.response_var_train, self.response_var_test = (
+            self.response_var[train_idx],
+            self.response_var[test_idx],
+        )
 
 
 class PreProcessData(SplitTestTrain):
-    def __init__(self, predictor_vars, response_var,
-                 train_split, seed, scale_type: str):
+    def __init__(
+        self, predictor_vars, response_var, train_split, seed, scale_type: str
+    ):
         # TODO: add something to handle for categorical variables
         """
         Scales the data
         :param scale_type: str -> 'normalize', 'standardize', 'min_max', 'scale'
         """
 
-        super().__init__(predictor_vars=predictor_vars, response_var=response_var, train_split=train_split, seed=seed)
+        super().__init__(
+            predictor_vars=predictor_vars,
+            response_var=response_var,
+            train_split=train_split,
+            seed=seed,
+        )
 
         self.scale_type = scale_type
 
-        if self.scale_type not in ['normalize', 'standardize', 'min_max', 'scale']:
+        if self.scale_type not in ["normalize", "standardize", "min_max", "scale"]:
             if self.scale_type:
-                raise ValueError(f"scale_type {self.scale_type} not in ['normalize', 'standardize', 'min_max', 'scale']")
+                raise ValueError(
+                    f"scale_type {self.scale_type} not in ['normalize', 'standardize', 'min_max', 'scale']"
+                )
             else:
                 pass
 
@@ -129,13 +151,17 @@ class PreProcessData(SplitTestTrain):
         :param scale_type: str -> 'normalize', 'standardize', 'min_max', 'scale'
         :return:
         """
-        if self.scale_type == 'min_max':
-            scaled_data = (data - self.predictor_min) / (self.predictor_max - self.predictor_mean)
-        elif self.scale_type == 'normalize':
-            scaled_data = (data - self.predictor_mean) / (self.predictor_max - self.predictor_min)
-        elif self.scale_type == 'standardize':
+        if self.scale_type == "min_max":
+            scaled_data = (data - self.predictor_min) / (
+                self.predictor_max - self.predictor_mean
+            )
+        elif self.scale_type == "normalize":
+            scaled_data = (data - self.predictor_mean) / (
+                self.predictor_max - self.predictor_min
+            )
+        elif self.scale_type == "standardize":
             scaled_data = (data - self.predictor_mean) / self.predictor_std
-        elif self.scale_type == 'scale':
+        elif self.scale_type == "scale":
             scaled_data = data - self.predictor_mean
         else:
             scaled_data = data

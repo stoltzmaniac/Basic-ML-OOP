@@ -6,16 +6,18 @@ from models.regression import LinearRegression
 
 @pytest.fixture(scope="module")
 def multiple_linear_regression_model(multiple_linear_regression_data):
-    linear_regression = LinearRegression(predictor_vars=multiple_linear_regression_data["predictor_vars"],
-                                         response_var=multiple_linear_regression_data["response_var"],
-                                         train_split=0.7,
-                                         seed=123,
-                                         learning_rate=0.01,
-                                         scale_type='normalize',
-                                         tolerance=0.00001,
-                                         batch_size=12,
-                                         max_epochs=1000,
-                                         decay=0.90)
+    linear_regression = LinearRegression(
+        predictor_vars=multiple_linear_regression_data["predictor_vars"],
+        response_var=multiple_linear_regression_data["response_var"],
+        train_split=0.7,
+        seed=123,
+        learning_rate=0.01,
+        scale_type="normalize",
+        tolerance=0.00001,
+        batch_size=12,
+        max_epochs=1000,
+        decay=0.90,
+    )
 
     linear_regression.fit_stochastic_gradient_descent()
     print(linear_regression)
@@ -23,7 +25,7 @@ def multiple_linear_regression_model(multiple_linear_regression_data):
 
 
 def test_multiple_linear_regression_data_passing_correctly(
-        multiple_linear_regression_model, multiple_linear_regression_data
+    multiple_linear_regression_model, multiple_linear_regression_data
 ):
     """
     Setup linear regression model
@@ -31,12 +33,12 @@ def test_multiple_linear_regression_data_passing_correctly(
     """
 
     assert (
-            multiple_linear_regression_model.predictor_vars_train.all()
-            == np.array(multiple_linear_regression_data["predictor_vars"]).all()
+        multiple_linear_regression_model.predictor_vars_train.all()
+        == np.array(multiple_linear_regression_data["predictor_vars"]).all()
     )
     assert (
-            multiple_linear_regression_model.response_var_train.all()
-            == multiple_linear_regression_data["response_var"].all()
+        multiple_linear_regression_model.response_var_train.all()
+        == multiple_linear_regression_data["response_var"].all()
     )
     assert type(multiple_linear_regression_model.predictor_vars_train) == np.ndarray
     assert type(multiple_linear_regression_model.response_var_train) == np.ndarray
@@ -57,8 +59,8 @@ def test_multiple_linear_regression_coefficients(multiple_linear_regression_mode
     no_of_betas = len(multiple_linear_regression_model.B)
     for n in range(no_of_betas):
         assert (
-                pytest.approx(expected_coefficients[n][1], 0.01)
-                == multiple_linear_regression_model.B[n]
+            pytest.approx(expected_coefficients[n][1], 0.01)
+            == multiple_linear_regression_model.B[n]
         )
 
 
