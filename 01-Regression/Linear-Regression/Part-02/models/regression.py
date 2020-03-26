@@ -126,7 +126,6 @@ class LinearRegression(Regression):
             if epoch % 100 == 0:
                 epoch_gradient = self.find_gradient(self.predictor_vars_train, self.response_var_train)
                 print(f"Epoch: {epoch} - Error: {epoch_gradient['error']}")
-                print(abs(error - epoch_gradient['error']))
                 if abs(error - epoch_gradient['error']) < self.tolerance:
                     print('Converged')
                     break
