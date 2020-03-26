@@ -1,13 +1,15 @@
 import numpy as np
+from models.data_handler import PreProcessData
 
-class Regression:
+class Regression(PreProcessData):
     def __init__(
         self,
-        predictor_vars: np.ndarray,
-        response_var: np.ndarray,
-        learning_rate: float,
-        train_split: float,
-        seed: int,
+        predictor_vars,
+        response_var,
+        train_split,
+        seed,
+        scale_type,
+        learning_rate
     ):
         """
         :param predictor_vars: np.ndarray
@@ -16,48 +18,16 @@ class Regression:
         :param train_split: float (0 < value < 1)
         :param seed: int
         """
-        # Check data types
-        if type(seed) != int:
-            raise ValueError(f"seed value not an int")
-        type_check_arrays = [
-            type(predictor_vars) == np.ndarray,
-            type(response_var) == np.ndarray,
-        ]
-        if not all(type_check_arrays):
-            raise ValueError(f"Type(s) of data for Regression class are not accurate")
-        if (
-            not type(learning_rate) == float
-            and type(train_split) == float
-            and train_split <= 1
-        ):
-            raise ValueError(f"learning_rate or train_split not acceptable input(s)")
-        if response_var.shape[0] != predictor_vars.shape[0]:
-            raise ValueError(
-                f"Dimension(s) of data for Regression class are not accurate"
-            )
-
-        all_data = np.column_stack((predictor_vars, response_var))
-        all_data = all_data.astype("float")
-        np.random.seed(seed)
-        np.random.shuffle(all_data)
-
-        split_row = round(all_data.shape[0] * train_split)
-        train_data = all_data[:split_row]
-        test_data = all_data[split_row:]
-
-        # Train
-        self.predictor_vars_train = train_data[:, :-1]
-        self.response_var_train = train_data[:, -1:]
-
-        # Test
-        self.predictor_vars_test = test_data[:, :-1]
-        self.response_var_test = test_data[:, -1:]
+        super().__init__(predictor_vars, response_var, train_split, seed, scale_type)
 
         self.learning_rate = learning_rate
-        self.cost = []
 
-    def plot(self):
-        pass
+        if not type(self.learning_rate) == float:
+            raise ValueError(f"learning_rate not a float")
+        if not 0 < self.learning_rate < 1:
+            raise ValueError(f"learning_rate needs to be between 0 and 1 (not including)")
+
+        self.cost = []
 
 
 class LinearRegression(Regression):
@@ -65,9 +35,10 @@ class LinearRegression(Regression):
         self,
         predictor_vars,
         response_var,
-        learning_rate,
         train_split,
         seed,
+        scale_type,
+        learning_rate,
         tolerance,
         batch_size,
         max_epochs,
@@ -76,13 +47,29 @@ class LinearRegression(Regression):
         """
         All inherited from Regression class
         """
+
         super().__init__(
             predictor_vars,
             response_var,
-            learning_rate,
             train_split,
             seed,
+            scale_type,
+            learning_rate
         )
+
+        self.tolerance = tolerance
+        self.batch_size = batch_size
+        self.max_epochs = max_epochs
+        self.decay = decay
+
+        if not type(self.tolerance) == float or not 0 < self.tolerance < 1:
+            raise ValueError(f"tolerance needs to be a float between 0 and 1, it is {self.tolerance}")
+        if not type(self.batch_size) == int:
+            raise ValueError(f"batch_size needs to be an int and shorter than the predictor_vars_train, it is {self.batch_size}")
+        if not type(self.max_epochs) == int:
+            raise ValueError(f"max_epochs needs to be an int, it is {self.max_epochs}")
+        if not type(self.decay) == float or not 0 < self.decay < 1:
+            raise ValueError(f"decay needs to be a float between 0 and 1, it is {self.decay}")
 
         # Add ones column to allow for beta 0
         self.predictor_vars_train = np.c_[
@@ -101,13 +88,8 @@ class LinearRegression(Regression):
         else:
             self.B = np.random.randn(self.predictor_vars_train.shape[1])
 
-        self.max_epochs = max_epochs
-        self.decay = decay
-        self.tolerance = tolerance
-        self.batch_size = batch_size
-
         # Automatically fit
-        #self.fit_gradient_descent()
+        #self.fit_stochastic_gradient_descent()
 
     def predict(self, values_to_predict: np.ndarray):
         data = np.c_[np.ones(len(values_to_predict), dtype="int64"),

@@ -18,6 +18,9 @@ class InputData(InputBase):
         :param predictor_vars: np.ndarray
         :param response_var: np.array (one dimensional)
         """
+
+        super().__init__()
+
         self.predictor_vars = self.convert_dataframe_to_array(predictor_vars)
         self.response_var = self.convert_dataframe_to_array(response_var)
 
@@ -27,7 +30,6 @@ class InputData(InputBase):
                 f"predictor_vars shape: {self.predictor_vars.shape}\n"
                 f"response_var shape: {self.response_var.shape}"
             )
-        super().__init__()
 
     @staticmethod
     def convert_dataframe_to_array(df_or_series):
@@ -37,7 +39,11 @@ class InputData(InputBase):
         :return: np.array
         """
         if isinstance(df_or_series, pd.DataFrame) or isinstance(df_or_series, pd.Series):
-            return np.array(df_or_series)
+            dat = np.array(df_or_series)
+            if len(dat.shape) == 1:
+                return dat[:, np.newaxis]
+            else:
+                return dat
         if isinstance(df_or_series, np.ndarray):
             return df_or_series
         else:
@@ -63,9 +69,19 @@ class SplitTestTrain(InputData):
         :param train_split: float percent used as training (Between 0 and 1)
         :param seed: int for repeatability
         """
+
+        super().__init__(predictor_vars, response_var)
+
         self.seed = seed
         self.train_split = train_split
-        super().__init__(predictor_vars, response_var)
+
+        if type(self.seed) != int:
+            raise ValueError(f"seed value not an int, it is {self.seed}")
+        if not type(self.train_split) == float:
+            raise ValueError(f"train_split not a float, it is {self.train_split}")
+        if not 0 < self.train_split < 1:
+            raise ValueError(f"train_split must be between 0 and 1 (not including), it is {self.train_split}")
+
         self.split_data()
 
     def split_data(self):
@@ -83,8 +99,8 @@ class SplitTestTrain(InputData):
 
 class PreProcessData(SplitTestTrain):
     def __init__(self, predictor_vars, response_var,
-                 scale_type,
-                 train_split, seed):
+                 train_split, seed, scale_type):
+        # TODO: add something to handle for categorical variables
         """
         Scales the data
         :param predictor_vars:
@@ -93,8 +109,17 @@ class PreProcessData(SplitTestTrain):
         :param seed:
         :param scale_type: str -> 'normalize', 'standardize', 'min_max', 'scale'
         """
-        self.scale_type = scale_type
+
         super().__init__(predictor_vars, response_var, train_split, seed)
+
+        self.scale_type = scale_type
+
+        if self.scale_type not in ['normalize', 'standardize', 'min_max', 'scale']:
+            if self.scale_type:
+                raise ValueError(f"scale_type {self.scale_type} not in ['normalize', 'standardize', 'min_max', 'scale']")
+            else:
+                pass
+
         self.predictor_mean = np.mean(self.predictor_vars_train, axis=0)
         self.predictor_std = np.std(self.predictor_vars_train, axis=0)
         self.predictor_max = np.max(self.predictor_vars_train, axis=0)
@@ -121,15 +146,3 @@ class PreProcessData(SplitTestTrain):
         else:
             scaled_data = data
         return scaled_data
-
-
-
-
-
-# #normalize
-# x = np.array(data)
-# x_mean = np.mean(x, axis=0)
-# x_std = np.std(x, axis=0)
-#
-# x1 = x - x_mean
-# x2 = x1 / x_std
