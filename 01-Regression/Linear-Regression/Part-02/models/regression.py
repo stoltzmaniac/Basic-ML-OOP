@@ -1,13 +1,10 @@
 import numpy as np
-import matplotlib.pyplot as plt
-
 
 class Regression:
     def __init__(
         self,
         predictor_vars: np.ndarray,
         response_var: np.ndarray,
-        iterations: int,
         learning_rate: float,
         train_split: float,
         seed: int,
@@ -15,7 +12,6 @@ class Regression:
         """
         :param predictor_vars: np.ndarray
         :param response_var: np.array (one dimensional)
-        :param iterations: int
         :param learning_rate: float
         :param train_split: float (0 < value < 1)
         :param seed: int
@@ -23,8 +19,6 @@ class Regression:
         # Check data types
         if type(seed) != int:
             raise ValueError(f"seed value not an int")
-        if type(iterations) != int or iterations <= 0:
-            raise ValueError(f"Invalid iterations value")
         type_check_arrays = [
             type(predictor_vars) == np.ndarray,
             type(response_var) == np.ndarray,
@@ -60,7 +54,6 @@ class Regression:
         self.response_var_test = test_data[:, -1:]
 
         self.learning_rate = learning_rate
-        self.iterations = iterations
         self.cost = []
 
     def plot(self):
@@ -72,7 +65,6 @@ class LinearRegression(Regression):
         self,
         predictor_vars,
         response_var,
-        iterations,
         learning_rate,
         train_split,
         seed,
@@ -87,7 +79,6 @@ class LinearRegression(Regression):
         super().__init__(
             predictor_vars,
             response_var,
-            iterations,
             learning_rate,
             train_split,
             seed,

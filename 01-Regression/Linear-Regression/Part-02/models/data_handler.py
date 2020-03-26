@@ -55,7 +55,7 @@ class InputData(InputBase):
 
 
 class SplitTestTrain(InputData):
-    def __init__(self, predictor_vars, response_var, train_split=0.70, seed=123):
+    def __init__(self, predictor_vars, response_var, train_split, seed):
         """
         Split the input data to test / train split to be used in machine learning
         :param predictor_vars: np.ndarray
@@ -83,8 +83,8 @@ class SplitTestTrain(InputData):
 
 class PreProcessData(SplitTestTrain):
     def __init__(self, predictor_vars, response_var,
-                 scale_type=None,
-                 train_split=0.70, seed=123):
+                 scale_type,
+                 train_split, seed):
         """
         Scales the data
         :param predictor_vars:
