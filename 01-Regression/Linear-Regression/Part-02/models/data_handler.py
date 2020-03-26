@@ -19,10 +19,10 @@ class InputData(InputBase):
         :param response_var: np.array (one dimensional)
         """
 
+        super().__init__()
+
         self.predictor_vars = self.convert_dataframe_to_array(predictor_vars)
         self.response_var = self.convert_dataframe_to_array(response_var)
-
-        super().__init__()
 
         if self.response_var.shape[0] != self.predictor_vars.shape[0]:
             raise ValueError(
@@ -68,10 +68,10 @@ class SplitTestTrain(InputData):
         :param seed: int for repeatability
         """
 
+        super().__init__(predictor_vars=predictor_vars, response_var=response_var)
+
         self.seed = seed
         self.train_split = train_split
-
-        super().__init__(predictor_vars, response_var)
 
         if type(self.seed) != int:
             raise ValueError(f"seed value not an int, it is {self.seed}")
@@ -104,9 +104,9 @@ class PreProcessData(SplitTestTrain):
         :param scale_type: str -> 'normalize', 'standardize', 'min_max', 'scale'
         """
 
-        self.scale_type = scale_type
+        super().__init__(predictor_vars=predictor_vars, response_var=response_var, train_split=train_split, seed=seed)
 
-        super().__init__(predictor_vars, response_var, train_split, seed)
+        self.scale_type = scale_type
 
         if self.scale_type not in ['normalize', 'standardize', 'min_max', 'scale']:
             if self.scale_type:

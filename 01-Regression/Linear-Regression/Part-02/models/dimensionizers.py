@@ -12,6 +12,8 @@ class PrincipalComponentAnalysis(PreProcessData):
         Returns object with PCA matrix and can be used to predict
         :param variance_explained_cutoff: float with value between 0 and 1, max cumulative variance explained cutoff
         """
+        super().__init__(predictor_vars=predictor_vars, response_var=response_var, train_split=train_split, seed=seed, scale_type=scale_type)
+
         self.variance_explained_cutoff = variance_explained_cutoff
         self.eigenvalues_all = []
         self.eigenvectors_all = []
@@ -21,8 +23,6 @@ class PrincipalComponentAnalysis(PreProcessData):
 
         if type(self.variance_explained_cutoff) != float or not 0 < self.variance_explained_cutoff < 1:
             raise ValueError(f"variance_explained_cutoff needs to be a float between 0 and 1, it is {self.variance_explained_cutoff}")
-
-        super().__init__(predictor_vars, response_var, train_split, seed, scale_type)
 
         self.calculate_eigens()
 
