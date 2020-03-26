@@ -97,7 +97,7 @@ class SplitTestTrain(InputData):
 
 class PreProcessData(SplitTestTrain):
     def __init__(self, predictor_vars, response_var,
-                 train_split, seed, scale_type: str):
+                 train_split, scale_type: str, seed):
         # TODO: add something to handle for categorical variables
         """
         Scales the data
