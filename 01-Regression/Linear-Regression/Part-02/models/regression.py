@@ -9,14 +9,11 @@ class Regression(PreProcessData):
         train_split,
         seed,
         scale_type,
-        learning_rate
+        learning_rate: float
     ):
         """
-        :param predictor_vars: np.ndarray
-        :param response_var: np.array (one dimensional)
-        :param learning_rate: float
-        :param train_split: float (0 < value < 1)
-        :param seed: int
+        Base class for all types of regression
+        :param learning_rate: float utilized in gradient descent between 0 and 1, usually extremely small
         """
 
         self.learning_rate = learning_rate

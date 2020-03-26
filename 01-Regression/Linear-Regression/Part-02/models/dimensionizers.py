@@ -7,7 +7,7 @@ class PrincipalComponentAnalysis(PreProcessData):
                  train_split,
                  seed,
                  scale_type,
-                 variance_explained_cutoff):
+                 variance_explained_cutoff: float):
         """
         Returns object with PCA matrix and can be used to predict
         :param variance_explained_cutoff: float with value between 0 and 1, max cumulative variance explained cutoff
