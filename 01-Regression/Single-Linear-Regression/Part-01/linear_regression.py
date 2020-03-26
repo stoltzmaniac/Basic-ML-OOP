@@ -26,7 +26,7 @@ class SingleLinearRegression:
             This class returns a dictionary of results from your on your linear regression:
             {{
                 'independent_var': {self.independent_var},
-                'dependent_var': {self.dependent_var},
+                'response_var': {self.dependent_var},
                 'fit': {{
                     'coefficient': coefficient,
                     'constant': constant,

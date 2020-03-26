@@ -63,6 +63,9 @@ class Regression:
         self.iterations = iterations
         self.cost = []
 
+    def plot(self):
+        pass
+
 
 class LinearRegression(Regression):
     def __init__(

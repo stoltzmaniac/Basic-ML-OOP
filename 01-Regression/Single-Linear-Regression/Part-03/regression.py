@@ -24,7 +24,7 @@ class Regression:
             raise ValueError(f'Type(s) of data for Regression class are not accurate')
         if not type(learning_rate) == float and type(train_split) == float and train_split <= 1:
             raise ValueError(f'learning_rate or train_split not acceptable input(s)')
-        # Check for single dimensional dependent_var
+        # Check for single dimensional response_var
         if dependent_var.shape[0] != 1 or dependent_var.shape[1] != independent_vars.shape[0]:
             raise ValueError(f'Dimension(s) of data for Regression class are not accurate')
 
@@ -68,7 +68,7 @@ class LinearRegression(Regression):
         return np.mean(self.dependent_var_train)
 
     def fit(self):
-        # Format: independent_vars_hat = b1*dependent_var + b0
+        # Format: independent_vars_hat = b1*response_var + b0
         x_minus_mean = [x - self.independent_vars_train_mean for x in self.independent_vars_train]
         y_minus_mean = [y - self.dependent_var_train_mean for y in self.dependent_var_train]
         b1_numerator = sum([x * y for x, y in zip(x_minus_mean, y_minus_mean)])
@@ -123,8 +123,8 @@ class LinearRegression(Regression):
 #                15.4,
 #                8]])
 #
-# c = LinearRegression(independent_vars=a,
-#                      dependent_var=b,
+# c = LinearRegression(predictor_vars=a,
+#                      response_var=b,
 #                      learning_rate=1.0,
 #                      train_split=0.67,
 #                      seed=123)
