@@ -61,7 +61,7 @@ class InputData(InputBase):
 
 
 class SplitTestTrain(InputData):
-    def __init__(self, predictor_vars, response_var, train_split: float, seed: int):
+    def __init__(self, predictor_vars, response_var, train_split: float, seed: int = 5):
         """
         Split the input data to test / train split to be used in machine learning
         :param train_split: float percent used as training (Between 0 and 1)
