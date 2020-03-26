@@ -16,9 +16,9 @@ class Regression(PreProcessData):
         :param learning_rate: float utilized in gradient descent between 0 and 1, usually extremely small
         """
 
-        self.learning_rate = learning_rate
-
         super().__init__(predictor_vars, response_var, train_split, seed, scale_type)
+
+        self.learning_rate = learning_rate
 
         if not type(self.learning_rate) == float:
             raise ValueError(f"learning_rate not a float")
