@@ -11,6 +11,12 @@ The goal is to make a basic library of machine learning objects in order to help
 In order to avoid flooding this README and wind up repeating my workload, you can checkout my blog: [Stoltzmaniac](https://www.stoltzmaniac.com/]
 
 
+In order to get yourself going, you have to go into the directory and then start playing with the import statements, etc.
+```bash
+cd 01-Regression/Linear-Regression/Part-02
+python
+```
+
 Here is an example of doing linear regression (both single and multivariate) and PCA.
 
 Setup:
