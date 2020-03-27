@@ -40,7 +40,7 @@ def iris_data() -> dict:
     """
     df = load_iris()
     yield {
-        "response_var": np.array(df)[:, -1],
-        "predictor_vars": np.array(df)[:, :3],
+        "response_var": df['target'],
+        "predictor_vars": df['data'],
     }
-    return print("multiple_linear_regression_data fixture finished.")
+    return print("iris_data fixture finished.")
